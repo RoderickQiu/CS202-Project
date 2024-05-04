@@ -9,6 +9,7 @@
 `define ALU_OP_BEQ 3'b001
 `define ALU_OP_R 3'b010
 `define ALU_OP_LUI 3'b011
+`define ALU_OP_AUIPC 3'b100
 
 `define R_TYPE 7'b0110011
 `define I_TYPE_1 7'b0010011

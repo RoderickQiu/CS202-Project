@@ -4,6 +4,7 @@
 module alu (
     input [31:0] read_data1,
     input [31:0] read_data2,
+    input [31:0] pc,
     input [31:0] imm32,
     input [3:0] aluop,  // ALUOp is 3 bits here
     input [6:0] func7,
@@ -30,8 +31,9 @@ module alu (
             `ALU_CTRL_ADD: alu_result = read_data1 + operand2;
             `ALU_CTRL_SUB: alu_result = read_data1 - operand2;
             `ALU_CTRL_AND: alu_result = read_data1 & operand2;
-            `ALU_CTRL_OR:  alu_result = read_data1 | operand2;
+            `ALU_CTRL_OR: alu_result = read_data1 | operand2;
             `ALU_CTRL_LUI: alu_result = operand2 << 12;
+            `ALU_CTRL_AUIPC: alu_result = pc + operand2;
         endcase
     end
 
