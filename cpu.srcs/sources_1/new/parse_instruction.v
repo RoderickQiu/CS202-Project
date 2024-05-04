@@ -13,49 +13,60 @@ module parse_instruction (
     assign opcode = instruction[6:0];
 
     always @* begin
-        rd = 5'b0; funct3 = 3'b0; rs1 = 5'b0;
-        rs2 = 5'b0; funct7 = 7'b0; imm = 32'b0;
+        rd = 5'b0;
+        funct3 = 3'b0;
+        rs1 = 5'b0;
+        rs2 = 5'b0;
+        funct7 = 7'b0;
+        imm = 32'b0;
         case (opcode)
-            `R_TYPE: begin // R-type
+            `R_TYPE: begin  // R-type
                 rd <= instruction[11:7];
                 funct3 <= instruction[14:12];
                 rs1 <= instruction[19:15];
                 rs2 <= instruction[24:20];
                 funct7 <= instruction[31:25];
             end
-            `I_TYPE_1: begin // I-type 1
+            `I_TYPE_1: begin  // I-type 1
                 rd <= instruction[11:7];
                 funct3 <= instruction[14:12];
                 rs1 <= instruction[19:15];
-                imm <= { {20{instruction[31]}}, instruction[31:20] };
+                imm <= {{20{instruction[31]}}, instruction[31:20]};
             end
-            `I_TYPE_2: begin // I-type 2
+            `I_TYPE_2: begin  // I-type 2
                 rd <= instruction[11:7];
                 funct3 <= instruction[14:12];
                 rs1 <= instruction[19:15];
-                imm <= { {20{instruction[31]}}, instruction[31:20] };
+                imm <= {{20{instruction[31]}}, instruction[31:20]};
             end
-            `S_TYPE: begin // S-type
-                funct3 <= instruction[14:12];
-                rs1 <= instruction[19:15];
-                rs2 <= instruction[24:20];
-                imm <= { {20{instruction[31]}}, instruction[31:25], instruction[11:7] };
-            end
-            `B_TYPE: begin // B-type
+            `S_TYPE: begin  // S-type
                 funct3 <= instruction[14:12];
                 rs1 <= instruction[19:15];
                 rs2 <= instruction[24:20];
-                imm <= { {19{instruction[31]}}, instruction[31], instruction[7], instruction[30:25], instruction[11:8], instruction[7] };
+                imm <= {{20{instruction[31]}}, instruction[31:25], instruction[11:7]};
             end
-            `U_TYPE_LUI: begin // U-type lui
+            `B_TYPE: begin  // B-type
+                funct3 <= instruction[14:12];
+                rs1 <= instruction[19:15];
+                rs2 <= instruction[24:20];
+                imm <= {
+                    {19{instruction[31]}},
+                    instruction[31],
+                    instruction[7],
+                    instruction[30:25],
+                    instruction[11:8],
+                    instruction[7]
+                };
+            end
+            `U_TYPE_LUI: begin  // U-type lui
                 rd <= instruction[11:7];
                 imm[31:12] <= instruction[31:12];
             end
-            `U_TYPE_AUIPC: begin // U-type auipc
+            `U_TYPE_AUIPC: begin  // U-type auipc
                 rd <= instruction[11:7];
                 imm[31:12] <= instruction[31:12];
             end
-            `ECALL: begin //ecall
+            `ECALL: begin  //ecall
                 funct3 <= 3'b000;
                 imm <= 0;
             end

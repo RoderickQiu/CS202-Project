@@ -1,8 +1,0 @@
-`define R_TYPE 7'b0110011
-`define I_TYPE_1 7'b0010011
-`define I_TYPE_2 7'b0000011
-`define S_TYPE 7'b0100011
-`define B_TYPE 7'b1100011
-`define U_TYPE_LUI 7'b0110111
-`define U_TYPE_AUIPC 7'b0010111
-`define ECALL 7'b1110011
