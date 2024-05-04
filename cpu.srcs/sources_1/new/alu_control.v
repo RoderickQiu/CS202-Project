@@ -18,6 +18,7 @@ module alu_control (
                 else if (func7 == 7'b0 && func3 == 3'b110) alu_ctrl = `ALU_CTRL_OR;
             end
             `ALU_OP_LUI: alu_ctrl = `ALU_CTRL_LUI;
+            `ALU_OP_AUIPC: alu_ctrl = `ALU_CTRL_AUIPC;
         endcase
     end
 

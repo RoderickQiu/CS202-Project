@@ -3,6 +3,7 @@
 `define ALU_CTRL_AND 4'b0000
 `define ALU_CTRL_OR 4'b0001
 `define ALU_CTRL_LUI 4'b0111
+`define ALU_CTRL_AUIPC 4'b0101
 
 `define ALU_OP_LW 3'b000
 `define ALU_OP_SW 3'b000
