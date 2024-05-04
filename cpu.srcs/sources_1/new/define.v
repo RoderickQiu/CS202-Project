@@ -5,6 +5,7 @@
 `define ALU_CTRL_LUI 4'b0111
 
 `define ALU_OP_LW 3'b000
+`define ALU_OP_SW 3'b000
 `define ALU_OP_BEQ 3'b001
 `define ALU_OP_R 3'b010
 `define ALU_OP_LUI 3'b011
