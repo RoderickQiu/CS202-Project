@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
-
+// The PC updates according to the rising edge of the clock signal.
+// Fetch the instruction from the program ROM according to the PC.
 module instruct_mem (
     input clk,
     input rst,
