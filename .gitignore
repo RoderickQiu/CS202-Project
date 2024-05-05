@@ -121,6 +121,7 @@ Temporary Items
 !*.xmp
 #Cache files
 *.cache
+*.runs
 
 ### Windows ###
 # Windows thumbnail cache files

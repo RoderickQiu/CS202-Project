@@ -6,47 +6,47 @@ module parse_instruction (
     output reg [4:0] rs1,
     output reg [4:0] rs2,
     output reg [4:0] rd,
-    output reg [6:0] funct7,
-    output reg [2:0] funct3
+    output reg [6:0] func7,
+    output reg [2:0] func3
 );
 
     assign opcode = instruction[6:0];
 
     always @* begin
         rd = 5'b0;
-        funct3 = 3'b0;
+        func3 = 3'b0;
         rs1 = 5'b0;
         rs2 = 5'b0;
-        funct7 = 7'b0;
+        func7 = 7'b0;
         imm = 32'b0;
         case (opcode)
             `R_TYPE: begin  // R-type
                 rd <= instruction[11:7];
-                funct3 <= instruction[14:12];
+                func3 <= instruction[14:12];
                 rs1 <= instruction[19:15];
                 rs2 <= instruction[24:20];
-                funct7 <= instruction[31:25];
+                func7 <= instruction[31:25];
             end
             `I_TYPE_1: begin  // I-type 1
                 rd <= instruction[11:7];
-                funct3 <= instruction[14:12];
+                func3 <= instruction[14:12];
                 rs1 <= instruction[19:15];
                 imm <= {{20{instruction[31]}}, instruction[31:20]};
             end
             `I_TYPE_2: begin  // I-type 2
                 rd <= instruction[11:7];
-                funct3 <= instruction[14:12];
+                func3 <= instruction[14:12];
                 rs1 <= instruction[19:15];
                 imm <= {{20{instruction[31]}}, instruction[31:20]};
             end
             `S_TYPE: begin  // S-type
-                funct3 <= instruction[14:12];
-                rs1 <= instruction[19:15];
-                rs2 <= instruction[24:20];
-                imm <= {{20{instruction[31]}}, instruction[31:25], instruction[11:7]};
+                func3 <= instruction[14:12];
+                rs1   <= instruction[19:15];
+                rs2   <= instruction[24:20];
+                imm   <= {{20{instruction[31]}}, instruction[31:25], instruction[11:7]};
             end
             `B_TYPE: begin  // B-type
-                funct3 <= instruction[14:12];
+                func3 <= instruction[14:12];
                 rs1 <= instruction[19:15];
                 rs2 <= instruction[24:20];
                 imm <= {
@@ -67,8 +67,8 @@ module parse_instruction (
                 imm[31:12] <= instruction[31:12];
             end
             `ECALL: begin  //ecall
-                funct3 <= 3'b000;
-                imm <= 0;
+                func3 <= 3'b000;
+                imm   <= 0;
             end
         endcase
     end
@@ -84,8 +84,8 @@ endmodule
     wire [4:0] rs2;
     wire [4:0] rd;
     wire [6:0] opcode;
-    wire [6:0] funct7;
-    wire [2:0] funct3;
+    wire [6:0] func7;
+    wire [2:0] func3;
 
     // 实例化被测模块
     parse_instruction uut (
@@ -95,8 +95,8 @@ endmodule
         .rs2(rs2),
         .rd(rd),
         .opcode(opcode),
-        .funct7(funct7),
-        .funct3(funct3)
+        .func7(func7),
+        .func3(func3)
     );
 
     initial begin
@@ -136,7 +136,7 @@ endmodule
 
     // 监视输出
     initial begin
-        $monitor("At time %d: opcode=%b, rd=%b, funct3=%b, rs1=%b, rs2=%b, funct7=%b, imm=%b",
-                 $time, opcode, rd, funct3, rs1, rs2, funct7, imm);
+        $monitor("At time %d: opcode=%b, rd=%b, func3=%b, rs1=%b, rs2=%b, func7=%b, imm=%b",
+                 $time, opcode, rd, func3, rs1, rs2, func7, imm);
     end
 endmodule*/

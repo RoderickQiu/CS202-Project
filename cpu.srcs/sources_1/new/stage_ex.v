@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 `include "define.v"
 
-module alu (
+module stage_ex (
     input [31:0] read_data1,
     input [31:0] read_data2,
     input [31:0] pc,

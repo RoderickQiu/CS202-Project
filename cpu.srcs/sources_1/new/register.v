@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-module Register (
+module register (
     input [4:0] id1,
     input [4:0] id2,
     input [4:0] idwr,
