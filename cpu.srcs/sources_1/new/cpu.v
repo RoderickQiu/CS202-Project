@@ -30,6 +30,7 @@ module cpu (
         .ALUSRC(ALUSRC),
         .RegWrite(RegWrite)
     );
+
     register REG (
         .id1(Reg_id1),
         .id1(Reg_id1),
@@ -40,12 +41,7 @@ module cpu (
         .rd1(Reg_out1),
         .rd2(Reg_out2)
     );
-    alu_control AC (
-        .aluop(ALUop),
-        .func7(func7),
-        .func3(func3),
-        .alu_ctrl(aluctrl)
-    );
+
     alu ALU (
         .read_data1(Reg_out1),
         .read_data2(Reg_out2),
@@ -58,6 +54,7 @@ module cpu (
         .alu_result(Result),
         .zero(zero)
     );
+
     parse_instruction PI (
         .instruction(Instruction),
         .opcode(opcode),
@@ -68,6 +65,7 @@ module cpu (
         .funct7(func7),
         .func3(func3)
     );
+
     //for beq imm
     instruct_mem Imem (
         .clk(clk),
@@ -78,6 +76,7 @@ module cpu (
         .instruct(Instruction),
         .pc(pc)
     );
+
     data_mem Dmem (
         .clk(clk),
         .rst(rst),
