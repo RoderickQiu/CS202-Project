@@ -1,4 +1,5 @@
-module register (
+`timescale 1ns / 1ps
+module Register (
     input [4:0] id1,
     input [4:0] id2,
     input [4:0] idwr,
@@ -18,9 +19,8 @@ module register (
     always @(posedge clk) begin
         if (RegWrite && idwr != 5'b00000) begin
             Reg[idwr] <= con;
-        end else begin
-            rd1 <= Reg[id1];
-            rd2 <= Reg[id2];
         end
+        rd1 <= Reg[id1];
+        rd2 <= Reg[id2];
     end
 endmodule

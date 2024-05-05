@@ -20,3 +20,9 @@
 `define U_TYPE_LUI 7'b0110111
 `define U_TYPE_AUIPC 7'b0010111
 `define ECALL 7'b1110011
+
+`define S_DELAY_0 64'd249999
+`define S_DELAY_1 64'd499999
+`define S_DELAY_2 64'd749999
+`define S_DELAY_3 64'd999999
+`define S_DELAY_4 64'd1249999

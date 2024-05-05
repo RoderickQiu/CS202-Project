@@ -5,12 +5,12 @@ module instruct_mem (
     input rst,
     input branch,
     input zero,
-    input [31:0] branch_target,
+    input [31:0] imm,
     output [31:0] instruct,
     output reg [31:0] pc,  // 4-based, so addr = pc[15:2]
-    output reg [31:0] next_pc,
-    output reg [31:0] pc_plus_4
 );
+    reg [31:0] next_pc,
+    reg [31:0] pc_plus_4
 
     prgrom urom (
         .clka (clk),
@@ -20,11 +20,11 @@ module instruct_mem (
 
     assign pc_plus_4 = {pc[31:2] + 1'b1, pc[1:0]};
 
-    always @(*) begin
+    always @(posedge !clk) begin
         if (branch && zero) begin
-            next_pc = branch_target;
+            next_pc = pc+imm;
         end else begin
-            next_pc = pc_plus_4[31:2];
+            next_pc = pc_plus_4;
         end
     end
 
@@ -32,8 +32,9 @@ module instruct_mem (
         if (rst) begin
             pc <= 32'b0;
         end else begin
-            pc <= next_pc << 2;
+            pc <= next_pc;
         end
+        pc_plus_4 = {pc[31:2] + 1'b1, pc[1:0]};
     end
 
 endmodule
