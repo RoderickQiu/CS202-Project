@@ -11,7 +11,7 @@ module alu (
     input [2:0] func3,
     input alu_src,
     output reg [31:0] alu_result,
-    output [1:0] zero
+    output zero
 );
 
     wire [ 3:0] alu_ctrl;
