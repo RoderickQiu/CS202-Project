@@ -15,12 +15,12 @@ module cpu (
 
     wire clk;  // the using clock signal
 
-    cpu_clk cpuclk ( // Maintain the clock signal
+    cpu_clk cpuclk (  // Maintain the clock signal
         .clk_in1 (clk_in),
         .clk_out1(clk)
     );
 
-    instruct_mem Imem ( // IF part: PC update + instruction fetch 
+    instruct_mem Imem (  // IF part: PC update + instruction fetch 
         .clk(clk),
         .rst(rst),
         .branch(Branch),
@@ -30,7 +30,7 @@ module cpu (
         .pc(pc)
     );
 
-    parse_instruction PI ( // ID Part: Parse the instruction
+    parse_instruction PI (  // ID Part: Parse the instruction
         .instruction(Instruction),
         .opcode(opcode),
         .imm(Imm),
@@ -41,7 +41,7 @@ module cpu (
         .func3(func3)
     );
 
-    instruction_control IC ( // ID part: Instruction control
+    instruction_control IC (  // ID part: Instruction control
         .opcode(opcode),
         .Branch(Branch),
         .Memread(Memread),
@@ -52,18 +52,18 @@ module cpu (
         .RegWrite(RegWrite)
     );
 
-    register REG ( // ID part: Register file
+    register REG (  // ID part: Register file
         .id1(Reg_id1),
-        .id1(Reg_id1),
+        .id1(Reg_id2),
         .idwr(Reg_idwr),
-        .con(Reg_idwr),
+        .con(Reg_con),
         .RegWrite(RegWrite),
         .clk(clk),
         .rd1(Reg_out1),
         .rd2(Reg_out2)
     );
 
-    alu ALU ( // EX part: ALU
+    alu ALU (  // EX part: ALU
         .read_data1(Reg_out1),
         .read_data2(Reg_out2),
         .pc(pc),
@@ -76,7 +76,7 @@ module cpu (
         .zero(zero)
     );
 
-    data_mem Dmem ( // MEM part: Data memory
+    data_mem Dmem (  // MEM part: Data memory
         .clk(clk),
         .rst(rst),
         .mem_write(Memwrite),

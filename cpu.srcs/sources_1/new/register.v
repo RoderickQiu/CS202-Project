@@ -17,10 +17,12 @@ module Register (
         end
     end
     always @(posedge clk) begin
+        rd1 <= Reg[id1];
+        rd2 <= Reg[id2];
+    end
+    always @(posedge !clk) begin
         if (RegWrite && idwr != 5'b00000) begin
             Reg[idwr] <= con;
         end
-        rd1 <= Reg[id1];
-        rd2 <= Reg[id2];
     end
 endmodule
