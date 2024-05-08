@@ -6,7 +6,6 @@ module stage_mem (
     input mem_write,
     input [31:0] mem_write_addr,  // orgininate from ALU
     input [31:0] mem_write_data,
-    output reg [31:0] read_data,
     output [31:0] tmp_data
 );
 
@@ -20,13 +19,5 @@ module stage_mem (
         .dina (mem_write_data),
         .douta(tmp_data)
     );
-
-    always @(*) begin
-        if (mem_write) begin
-            read_data = tmp_data;
-        end else begin
-            read_data = mem_write_addr;
-        end
-    end
 
 endmodule

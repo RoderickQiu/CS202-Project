@@ -3,7 +3,9 @@
 
 module cpu (
     input clk_in,
-    input rst
+    input rst,
+    input [23:0] switch2N4,
+    output wire [23:0]led2N4
 );
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
@@ -70,7 +72,6 @@ module cpu (
         .mem_write(Memwrite),
         .mem_write_addr(Result),
         .mem_write_data(Reg_out2),
-        .read_data(Reg_con),
         .tmp_data(Reg_tmp)
     );
 
