@@ -5,7 +5,7 @@ module cpu (
     input clk_in,
     input rst,
     input [23:0] switch2N4,
-    output wire [23:0]led2N4
+    output wire [23:0] led2N4
 );
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
