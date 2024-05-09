@@ -10,6 +10,8 @@ module stage_id (
     output Memwrite,
     output ALUSRC,
     output RegWrite,
+    output OIread,
+    output OIwrite,
     output [31:0] Reg_out1,
     output [31:0] Reg_out2,
     output [31:0] Imm,
@@ -19,7 +21,7 @@ module stage_id (
 
     wire [4:0] Reg_id1, Reg_id2, Reg_idwr;
     wire [6:0] opcode;
-    wire zero;
+    wire zero,oi;
 
     parse_instruction PI (  // ID Part: Parse the instruction
         .instruction(Instruction),
@@ -29,18 +31,22 @@ module stage_id (
         .rs2(Reg_id2),
         .rd(Reg_idwr),
         .func7(func7),
-        .func3(func3)
+        .func3(func3),
+        .oi(oi)
     );
 
     instruction_control IC (  // ID part: Instruction control
         .opcode(opcode),
+        .oi(oi),
         .Branch(Branch),
         .Memread(Memread),
         .Memtoreg(Memtoreg),
         .ALUop(ALUop),
         .Memwrite(Memwrite),
         .ALUSRC(ALUSRC),
-        .RegWrite(RegWrite)
+        .RegWrite(RegWrite),
+        .OIread(OIread),
+        .OIwrite(OIwrite)
     );
 
     register REG (  // ID part: Register file

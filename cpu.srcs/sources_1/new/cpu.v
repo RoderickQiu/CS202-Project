@@ -10,6 +10,7 @@ module cpu (
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
     wire Branch, Memread, Memtoreg, Memwrite, ALUSRC, RegWrite;
+    wire Oiread,Oiwrite;
     wire [3:0] ALUop;
     wire [6:0] func7;
     wire [2:0] func3;
@@ -44,6 +45,8 @@ module cpu (
         .Memwrite(Memwrite),
         .ALUSRC(ALUSRC),
         .RegWrite(RegWrite),
+        .OIread(Oiread),
+        .OIwrite(Oiwrite),
         .Reg_out1(Reg_out1),
         .Reg_out2(Reg_out2),
         .Imm(Imm),
@@ -69,7 +72,10 @@ module cpu (
     stage_mem MEM (
         .clk(clk),
         .rst(rst),
+        .mem_read(Memread),
         .mem_write(Memwrite),
+        .oi_read(Oiread),
+        .oi_write(Oiwrite),
         .mem_write_addr(Result),
         .mem_write_data(Reg_out2),
         .tmp_data(Reg_tmp)
@@ -77,6 +83,12 @@ module cpu (
 
     // WB part: Write back
     stage_wb WB (
+        .mem_to_reg(Memtoreg),
+        .read_data(Reg_con),
+        .mem_write_addr(Result),
+        .tmp_data(Reg_tmp)
+    );
+     led Led (
         .mem_to_reg(Memtoreg),
         .read_data(Reg_con),
         .mem_write_addr(Result),

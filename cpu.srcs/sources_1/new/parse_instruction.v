@@ -7,7 +7,9 @@ module parse_instruction (
     output reg [4:0] rs2,
     output reg [4:0] rd,
     output reg [6:0] func7,
-    output reg [2:0] func3
+    output reg [2:0] func3,
+    output reg oi
+
 );
 
     assign opcode = instruction[6:0];
@@ -71,6 +73,7 @@ module parse_instruction (
                 imm   <= 0;
             end
         endcase
+        oi= (imm[31:10]=22'b0000_0000_0000_0000_0000_00) ? 1'b1 :1'b0;
     end
 
 endmodule
