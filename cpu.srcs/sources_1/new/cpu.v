@@ -37,6 +37,8 @@ module cpu (
         .clk_out1(clk),
         .clk_out2(upg_clk)
     );
+    //assign clk = clk_in;
+    //assign upg_clk = clk_in;
 
     wire spg_bufg, rst_in;
     BUFG U1 (
@@ -45,7 +47,7 @@ module cpu (
     );
 
     reg upg_rst;
-    always @(posedge clk_in) begin
+    always @(posedge clk) begin
         if (spg_bufg) upg_rst = 0;
         if (fpga_rst) upg_rst = 1;
     end
