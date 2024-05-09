@@ -73,7 +73,7 @@ module parse_instruction (
                 imm   <= 0;
             end
         endcase
-        oi= (imm[31:10]=22'b0000_0000_0000_0000_0000_00) ? 1'b1 :1'b0;
+        oi= (imm[31:10]==22'b0000_0000_0000_0000_0000_00) ? 1'b1 :1'b0;
     end
 
 endmodule
@@ -90,7 +90,7 @@ endmodule
     wire [6:0] func7;
     wire [2:0] func3;
 
-    // 实例化被测模块
+    // 实例化被测模�?
     parse_instruction uut (
         .instruction(instruction),
         .imm(imm),
@@ -103,7 +103,7 @@ endmodule
     );
 
     initial begin
-        // 初始化指令
+        // 初始化指�?
         instruction = 32'b01000000110001011000010100110011; // R-type sub x10, x11, x12
         #10;
 

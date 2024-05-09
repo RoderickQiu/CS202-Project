@@ -3,7 +3,9 @@
 
 module cpu (
     input clk_in,
+    input clk_in_i,
     input fpga_rst,
+    input fpga_rst_i,
     input [23:0] switch2N4,
     output wire [23:0] led2N4,
 
@@ -12,10 +14,13 @@ module cpu (
     input  rx,
     output tx
 );
+    IBUFG ibufg1(.I(clk_in_i),.O(clk_in));
+    IBUFG ibufg2(.I(fpga_rst_i),.O(fpga_rst));
+        
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
     wire Branch, Memread, Memtoreg, Memwrite, ALUSRC, RegWrite;
-    wire Oiread, Oiwrite;
+    wire oiread, oiwrite;
     wire [3:0] ALUop;
     wire [6:0] func7;
     wire [2:0] func3;
@@ -26,6 +31,7 @@ module cpu (
     wire [31:0] upg_dat_o;  // data to prgrom / dmem32
     wire [31:0]data_switch;
     wire led_control,switch_control;
+        
     cpu_clk cpuclk (  // Maintain the clock signal
         .clk_in1 (clk_in),
         .clk_out1(clk),
@@ -86,8 +92,8 @@ module cpu (
         .Memwrite(Memwrite),
         .ALUSRC(ALUSRC),
         .RegWrite(RegWrite),
-        .OIread(Oiread),
-        .OIwrite(Oiwrite),
+        .OIread(oiread),
+        .OIwrite(oiwrite),
         .Reg_out1(Reg_out1),
         .Reg_out2(Reg_out2),
         .Imm(Imm),
@@ -116,7 +122,7 @@ module cpu (
         .mem_read(Memread),
         .mem_write(Memwrite),
         .data_switch(data_switch),
-        .oi_write(Oiwrite),
+        .oi_write(oiwrite),
         .mem_write_addr(Result),
         .mem_write_data(Reg_out2),
         .tmp_data(Reg_tmp),
@@ -136,20 +142,20 @@ module cpu (
         .oiwrite(oiwrite),
         .switch_control(switch_control),
         .led_control(led_control),
-        .sw_data(sw_data),        
+        .sw_data(data_switch),        
         .mem_write_addr(Result),
         .tmp_data(Reg_tmp)
     );
 
     led u_led (
         .clk(clk),
-        .rst(rst),
+        .rst(rst_in),
         .led_control(led_control),
         .ledwdata(Reg_out2[23:0]),
         .ledout(led2N4)
     );
     switch u_sw (
-        .clk(cpu_clk),
+        .clk(clk),
         .rst(rst_in),
         .switch_control(switch_control),
         .switch_rdata(switch2N4),

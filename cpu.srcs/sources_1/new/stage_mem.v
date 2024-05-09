@@ -25,14 +25,11 @@ module stage_mem (
     // CPU work on Uart communicate mode when kickOff is 0
     wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
 
-    wire trans_clk;
-    assign trans_clk = !clk;
     wire [31:0]out_mem;
     wire [15:0]out_oi;
     wire write=mem_write|oi_write;
     dmem32 dmem (
         .clka (kickOff ? trans_clk : upg_clk_i),
-        .read (mem_read),
         .wea  (kickOff ? write : upg_wen_i),
         .addra(kickOff ? mem_write_addr[15:2] : upg_adr_i),
         .dina (kickOff ? write : upg_dat_i),

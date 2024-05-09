@@ -10,7 +10,7 @@ module switch (
     always @(negedge clk or posedge rst) begin
         if (rst) begin
             sw_data <= 0;
-        end else if (SwitchCtrlLow) begin
+        end else if (switch_control) begin
             sw_data<=switch_rdata;
         end else begin
             sw_data <= sw_data;
