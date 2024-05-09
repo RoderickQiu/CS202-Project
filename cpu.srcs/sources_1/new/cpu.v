@@ -24,7 +24,8 @@ module cpu (
     wire upg_wen_o, upg_done_o;  // uart write out enable, rx data have done
     wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
     wire [31:0] upg_dat_o;  // data to prgrom / dmem32
-
+    wire [31:0]data_switch;
+    wire led_control,switch_control;
     cpu_clk cpuclk (  // Maintain the clock signal
         .clk_in1 (clk_in),
         .clk_out1(clk),
@@ -114,7 +115,7 @@ module cpu (
         .rst(rst_in),
         .mem_read(Memread),
         .mem_write(Memwrite),
-        .oi_read(Oiread),
+        .data_switch(data_switch),
         .oi_write(Oiwrite),
         .mem_write_addr(Result),
         .mem_write_data(Reg_out2),
@@ -131,15 +132,27 @@ module cpu (
     stage_wb WB (
         .mem_to_reg(Memtoreg),
         .read_data(Reg_con),
+        .oiread(oiread),
+        .oiwrite(oiwrite),
+        .switch_control(switch_control),
+        .led_control(led_control),
+        .sw_data(sw_data),        
         .mem_write_addr(Result),
         .tmp_data(Reg_tmp)
     );
 
-    led Led (
-        .mem_to_reg(Memtoreg),
-        .read_data(Reg_con),
-        .mem_write_addr(Result),
-        .tmp_data(Reg_tmp)
+    led u_led (
+        .clk(clk),
+        .rst(rst),
+        .led_control(led_control),
+        .ledwdata(Reg_out2[23:0]),
+        .ledout(led2N4)
     );
-
+    switch u_sw (
+        .clk(cpu_clk),
+        .rst(rst_in),
+        .switch_control(switch_control),
+        .switch_rdata(switch2N4),
+        .switch_wdata(data_switch)
+    );
 endmodule

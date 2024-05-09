@@ -5,8 +5,8 @@ module stage_mem (
     input rst,
     input mem_read,
     input mem_write,
-    input oi_read,
     input oi_write,
+    input [31:0] data_switch,
     input [31:0] mem_write_addr,  // orgininate from ALU
     input [31:0] mem_write_data,
     output [31:0] tmp_data,
@@ -25,35 +25,37 @@ module stage_mem (
     // CPU work on Uart communicate mode when kickOff is 0
     wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
 
-    wire [31:0] out_mem;
-    wire [15:0] out_oi;
-
+    wire trans_clk;
+    assign trans_clk = !clk;
+    wire [31:0]out_mem;
+    wire [15:0]out_oi;
+    wire write=mem_write|oi_write;
     dmem32 dmem (
         .clka (kickOff ? trans_clk : upg_clk_i),
         .read (mem_read),
-        .wea  (kickOff ? mem_write : upg_wen_i),
+        .wea  (kickOff ? write : upg_wen_i),
         .addra(kickOff ? mem_write_addr[15:2] : upg_adr_i),
-        .dina (kickOff ? mem_write_data : upg_dat_i),
+        .dina (kickOff ? write : upg_dat_i),
         .douta(out_mem)
     );
 
-    oi24 IO (
-        .clka (trans_clk),
-        .read (mem_read),
-        .wea  (mem_write),
-        .addra(mem_write_addr[15:2]),
-        .dina (mem_write_data),
-        .douta(tmp_out_oi)
-    );
+    // oi24 IO (
+    //     .clka (trans_clk),
+    //     .read (mem_read),
+    //     .wea  (mem_write),
+    //     .addra(mem_write_addr[15:2]),
+    //     .dina (mem_write_data),
+    //     .douta(tmp_out_oi)
+    // );
 
-    mem_or_io dmemio (
-        .mem_read(mem_read),
-        .mem_write(mem_write),
-        .oi_read(oi_read),
-        .oi_write(oi_write),
-        .alu_result_addr(mem_write_addr),
-        .mem_read_data(out_mem),
-        .io_read_data(out_oi),
-        .data_read_output(tmp_data),
-    );
+    // mem_or_io dmemio (
+    //     .mem_read(mem_read),
+    //     .mem_write(mem_write),
+    //     .oi_read(oi_read),
+    //     .oi_write(oi_write),
+    //     .alu_result_addr(mem_write_addr),
+    //     .mem_read_data(out_mem),
+    //     .io_read_data(out_oi),
+    //     .data_read_output(tmp_data),
+    // );
 endmodule
