@@ -3,9 +3,9 @@
 
 module cpu (
     input clk_in,
-    input clk_in_i,
+    // input clk_in_i,
     input fpga_rst,
-    input fpga_rst_i,
+    // input fpga_rst_i,
     input [23:0] switch2N4,
     output wire [23:0] led2N4,
 
@@ -14,8 +14,8 @@ module cpu (
     input  rx,
     output tx
 );
-    IBUFG ibufg1(.I(clk_in_i),.O(clk_in));
-    IBUFG ibufg2(.I(fpga_rst_i),.O(fpga_rst));
+    // IBUFG ibufg1(.I(clk_in_i),.O(clk_in));
+    // IBUFG ibufg2(.I(fpga_rst_i),.O(fpga_rst));
         
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
