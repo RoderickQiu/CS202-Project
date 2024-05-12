@@ -23,7 +23,7 @@ module test ();
         .tx(tx)
     );
     always begin
-        #5 clk = !clk;
+        #10 clk = !clk;
     end
     initial begin
         #700 begin

@@ -36,7 +36,7 @@ module cpu (
     wire [31:0]data_switch;
     wire led_control,switch_control;
         
-    cpuclk cpu_clk (  // Maintain the clock signal
+    cpu_clk cpuclk (  // Maintain the clock signal
         .clk_in1 (clk_in),
         .clk_out1(clk),
         .clk_out2(upg_clk)
