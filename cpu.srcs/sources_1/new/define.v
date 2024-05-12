@@ -2,6 +2,10 @@
 `define ALU_CTRL_SUB 4'b0110
 `define ALU_CTRL_AND 4'b0000
 `define ALU_CTRL_OR 4'b0001
+`define ALU_CTRL_SLL 4'b0011
+`define ALU_CTRL_SRL 4'b0100
+`define ALU_CTRL_ADD_SIGNED 4'b1000
+`define ALU_CTRL_SUB_SIGNED 4'b1001
 `define ALU_CTRL_LUI 4'b0111
 `define ALU_CTRL_AUIPC 4'b0101
 
@@ -11,6 +15,8 @@
 `define ALU_OP_R 3'b010
 `define ALU_OP_LUI 3'b011
 `define ALU_OP_AUIPC 3'b100
+`define ALU_OP_B_SIGNED 3'b101
+`define ALU_OP_B_UNSIGNED 3'b110
 
 `define R_TYPE 7'b0110011
 `define I_TYPE_1 7'b0010011

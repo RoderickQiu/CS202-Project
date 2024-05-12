@@ -30,8 +30,12 @@ module stage_ex (
         case (alu_ctrl)
             `ALU_CTRL_ADD: alu_result = read_data1 + operand2;
             `ALU_CTRL_SUB: alu_result = read_data1 - operand2;
+            `ALU_CTRL_ADD_SIGNED: alu_result = $signed(read_data1) + $signed(operand2);
+            `ALU_CTRL_SUB_SIGNED: alu_result = $signed(read_data1) - $signed(operand2);
             `ALU_CTRL_AND: alu_result = read_data1 & operand2;
             `ALU_CTRL_OR: alu_result = read_data1 | operand2;
+            `ALU_CTRL_SLL: alu_result = read_data1 << operand2[4:0];
+            `ALU_CTRL_SRL: alu_result = read_data1 >> operand2[4:0];
             `ALU_CTRL_LUI: alu_result = operand2 << 12;
             `ALU_CTRL_AUIPC: alu_result = pc + operand2;
         endcase

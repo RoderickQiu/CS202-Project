@@ -8,6 +8,10 @@ module cpu (
     // input fpga_rst_i,
     input [23:0] switch2N4,
     output wire [23:0] led2N4,
+    input      [3:0] key_row,
+    output [3:0] key_col,
+    output     [7:0] seg_an,
+    output [7:0] seg_out,
 
     // UART ports
     input  start_pg,
@@ -32,7 +36,7 @@ module cpu (
     wire [31:0]data_switch;
     wire led_control,switch_control;
         
-    cpu_clk cpuclk (  // Maintain the clock signal
+    cpuclk cpu_clk (  // Maintain the clock signal
         .clk_in1 (clk_in),
         .clk_out1(clk),
         .clk_out2(upg_clk)
@@ -156,6 +160,7 @@ module cpu (
         .ledwdata(Reg_out2[23:0]),
         .ledout(led2N4)
     );
+
     switch u_sw (
         .clk(clk),
         .rst(rst_in),
@@ -163,4 +168,14 @@ module cpu (
         .switch_rdata(switch2N4),
         .switch_wdata(data_switch)
     );
+
+    key_and_7seg u_key (
+        .clk(clk),
+        .rst(rst_in),
+        .key_row(key_row),
+        .key_col(key_col),
+        .seg_an(seg_an),
+        .seg_out(seg_out)
+    );
+
 endmodule

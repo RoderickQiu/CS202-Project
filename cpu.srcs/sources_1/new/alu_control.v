@@ -16,7 +16,11 @@ module alu_control (
                 else if (func7 == 7'b0100000 && func3 == 3'b000) alu_ctrl = `ALU_CTRL_SUB;
                 else if (func7 == 7'b0 && func3 == 3'b111) alu_ctrl = `ALU_CTRL_AND;
                 else if (func7 == 7'b0 && func3 == 3'b110) alu_ctrl = `ALU_CTRL_OR;
+                else if (func7 == 7'b0 && func3 == 3'b001) alu_ctrl = `ALU_CTRL_SLL;
+                else if (func7 == 7'b0 && func3 == 3'b101) alu_ctrl = `ALU_CTRL_SRL;
             end
+            `ALU_OP_B_SIGNED: alu_ctrl = `ALU_CTRL_SUB_SIGNED;
+            `ALU_OP_B_UNSIGNED: alu_ctrl = `ALU_CTRL_SUB;
             `ALU_OP_LUI: alu_ctrl = `ALU_CTRL_LUI;
             `ALU_OP_AUIPC: alu_ctrl = `ALU_CTRL_AUIPC;
         endcase
