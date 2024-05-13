@@ -1,4 +1,6 @@
 `timescale 1ns / 1ps
+`include "define.v"
+
 module register (
     input [4:0] id1,
     input [4:0] id2,
@@ -13,7 +15,8 @@ module register (
     integer i;
     initial begin
         for (i = 0; i < 32; i = i + 1) begin
-            Reg[i] = 0;
+            if (i == 1) Reg[i] = `SP_REG_INITIAL;
+            else Reg[i] = 0;
         end
     end
     always @(posedge clk) begin

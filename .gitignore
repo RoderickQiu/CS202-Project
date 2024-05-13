@@ -122,6 +122,8 @@ Temporary Items
 #Cache files
 *.cache
 *.runs
+*.sim
+*.wcfg
 
 ### Windows ###
 # Windows thumbnail cache files

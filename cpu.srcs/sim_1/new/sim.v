@@ -23,10 +23,10 @@ module test ();
         .tx(tx)
     );
     always begin
-        #10 clk = !clk;
+        #2 clk = !clk;
     end
     initial begin
-        #700 begin
+        #100 begin
             fpga_rst = 0;
             switch2N4 = 24'b00100000_1110_1110_1101_0000;
         end

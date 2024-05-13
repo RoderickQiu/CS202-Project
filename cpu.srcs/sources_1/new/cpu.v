@@ -2,25 +2,21 @@
 `include "define.v"
 
 module cpu (
-    input clk_in,
-    // input clk_in_i,
-    input fpga_rst,
-    // input fpga_rst_i,
-    input [23:0] switch2N4,
+    input              clk_in,
+    input              fpga_rst,
+    input       [23:0] switch2N4,
     output wire [23:0] led2N4,
-    input      [3:0] key_row,
-    output [3:0] key_col,
-    output     [7:0] seg_an,
-    output [7:0] seg_out,
+    input       [ 3:0] key_row,
+    output      [ 3:0] key_col,
+    output      [ 7:0] seg_an,
+    output      [ 7:0] seg_out,
 
     // UART ports
     input  start_pg,
     input  rx,
     output tx
 );
-    // IBUFG ibufg1(.I(clk_in_i),.O(clk_in));
-    // IBUFG ibufg2(.I(fpga_rst_i),.O(fpga_rst));
-        
+
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
     wire Branch, Memread, Memtoreg, Memwrite, ALUSRC, RegWrite;
@@ -28,21 +24,37 @@ module cpu (
     wire [3:0] ALUop;
     wire [6:0] func7;
     wire [2:0] func3;
-    wire zero;
-    wire clk, upg_clk, upg_clk_o;  // the using clock signals
+    wire zero, upg_clk_o;
+    reg clk, upg_clk;  // the using clock signals
     wire upg_wen_o, upg_done_o;  // uart write out enable, rx data have done
     wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
     wire [31:0] upg_dat_o;  // data to prgrom / dmem32
-    wire [31:0]data_switch;
-    wire led_control,switch_control;
-        
-    cpu_clk cpuclk (  // Maintain the clock signal
-        .clk_in1 (clk_in),
-        .clk_out1(clk),
-        .clk_out2(upg_clk)
-    );
-    //assign clk = clk_in;
-    //assign upg_clk = clk_in;
+    wire [31:0] data_switch;
+    wire led_control, switch_control;
+    reg [4:0] divider_clk, divider_upg;
+    
+    initial begin
+        clk = 0;
+        upg_clk = 0;
+        divider_clk = 0;
+        divider_upg = 0;
+    end
+
+    always @(posedge clk_in) begin
+        divider_clk <= divider_clk + 1;
+        if (divider_clk == 3) begin
+            clk <= ~clk;
+            divider_clk <= 0;
+        end
+    end
+
+    always @(posedge clk_in) begin
+        divider_upg <= divider_upg + 1;
+        if (divider_upg == 9) begin
+            upg_clk <= ~upg_clk;
+            divider_upg <= 0;
+        end
+    end
 
     wire spg_bufg, rst_in;
     BUFG U1 (
@@ -148,7 +160,7 @@ module cpu (
         .oiwrite(oiwrite),
         .switch_control(switch_control),
         .led_control(led_control),
-        .sw_data(data_switch),        
+        .sw_data(data_switch),
         .mem_write_addr(Result),
         .tmp_data(Reg_tmp)
     );
