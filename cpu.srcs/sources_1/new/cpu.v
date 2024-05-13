@@ -19,12 +19,12 @@ module cpu (
 
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
-    wire Branch, Memread, Memtoreg, Memwrite, ALUSRC, RegWrite;
-    wire oiread, oiwrite;
+    wire Branch = 0, Memread = 0, Memtoreg = 0, Memwrite = 0, ALUSRC = 0, RegWrite = 0;
+    wire oiread = 0, oiwrite = 0;
     wire [3:0] ALUop;
     wire [6:0] func7;
     wire [2:0] func3;
-    wire zero, upg_clk_o;
+    wire zero = 0, upg_clk_o = 0;
     reg clk, upg_clk;  // the using clock signals
     wire upg_wen_o, upg_done_o;  // uart write out enable, rx data have done
     wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
@@ -34,10 +34,10 @@ module cpu (
     reg [4:0] divider_clk, divider_upg;
     
     initial begin
-        clk = 0;
-        upg_clk = 0;
         divider_clk = 0;
-        divider_upg = 0;
+        divider_upg = 0;   
+        clk = 0;
+        upg_clk = 0;    
     end
 
     always @(posedge clk_in) begin
@@ -56,7 +56,7 @@ module cpu (
         end
     end
 
-    wire spg_bufg, rst_in;
+    wire spg_bufg;
     BUFG U1 (
         .I(start_pg),
         .O(spg_bufg)
@@ -65,9 +65,10 @@ module cpu (
     reg upg_rst;
     always @(posedge clk) begin
         if (spg_bufg) upg_rst = 0;
-        if (fpga_rst) upg_rst = 1;
+        if (fpga_rst) begin // the main reset
+            upg_rst = 1;
+        end
     end
-    assign rst_in = fpga_rst | upg_rst;
 
     uart_bmpg_0 uart (
         .upg_clk_i(upg_clk),
@@ -85,7 +86,7 @@ module cpu (
     // IF part: Instruction fetch
     stage_if IF (
         .clk(clk),
-        .rst(rst_in),
+        .rst(fpga_rst),
         .branch(Branch),
         .zero(zero),
         .imm(Imm),
@@ -136,7 +137,7 @@ module cpu (
     // MEM part: Data memory
     stage_mem MEM (
         .clk(clk),
-        .rst(rst_in),
+        .rst(fpga_rst),
         .mem_read(Memread),
         .mem_write(Memwrite),
         .data_switch(data_switch),
@@ -167,7 +168,7 @@ module cpu (
 
     led u_led (
         .clk(clk),
-        .rst(rst_in),
+        .rst(fpga_rst),
         .led_control(led_control),
         .ledwdata(Reg_out2[23:0]),
         .ledout(led2N4)
@@ -175,7 +176,7 @@ module cpu (
 
     switch u_sw (
         .clk(clk),
-        .rst(rst_in),
+        .rst(fpga_rst),
         .switch_control(switch_control),
         .switch_rdata(switch2N4),
         .switch_wdata(data_switch)
@@ -183,7 +184,7 @@ module cpu (
 
     key_and_7seg u_key (
         .clk(clk),
-        .rst(rst_in),
+        .rst(fpga_rst),
         .key_row(key_row),
         .key_col(key_col),
         .seg_an(seg_an),

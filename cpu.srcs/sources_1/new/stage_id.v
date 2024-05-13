@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 module stage_id (
     input clk,
+    input rst,
     input [31:0] Instruction,
     input [31:0] Reg_con,
     output Branch,
@@ -21,7 +22,7 @@ module stage_id (
 
     wire [4:0] Reg_id1, Reg_id2, Reg_idwr;
     wire [6:0] opcode;
-    wire zero,oi;
+    wire zero, oi;
 
     parse_instruction PI (  // ID Part: Parse the instruction
         .instruction(Instruction),
@@ -36,6 +37,7 @@ module stage_id (
     );
 
     instruction_control IC (  // ID part: Instruction control
+        .rst(rst),
         .opcode(opcode),
         .oi(oi),
         .Branch(Branch),
@@ -56,6 +58,7 @@ module stage_id (
         .con(Reg_con),
         .RegWrite(RegWrite),
         .clk(clk),
+        .rst(rst),
         .rd1(Reg_out1),
         .rd2(Reg_out2)
     );

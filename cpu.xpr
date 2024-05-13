@@ -32,7 +32,7 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="27"/>
+    <Option Name="WTXSimLaunchSim" Val="82"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -210,6 +210,13 @@
     </FileSet>
     <FileSet Name="sim_1" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_1">
       <Filter Type="Srcs"/>
+      <File Path="$PSRCDIR/sources_1/new/stage_id.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sim_1/new/sim.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -225,15 +232,15 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sim_1/imports/CS202-Project/test_behav.wcfg">
+      <File Path="$PSRCDIR/sim_1/new/sim_id.v">
         <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="ImportPath" Val="$PPRDIR/test_behav.wcfg"/>
-          <Attr Name="ImportTime" Val="1715580894"/>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/test_behav1.wcfg">
+      <File Path="$PPRDIR/test_behav3.wcfg">
         <FileInfo>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -247,7 +254,8 @@
         <Option Name="SrcSet" Val="sources_1"/>
         <Option Name="XSimWcfgFile" Val="$PPRDIR/test_behav.wcfg"/>
         <Option Name="XSimWcfgFile" Val="$PPRDIR/test_behav1.wcfg"/>
-        <Option Name="xsim.simulate.runtime" Val="100000ns"/>
+        <Option Name="XSimWcfgFile" Val="$PPRDIR/test_behav2.wcfg"/>
+        <Option Name="XSimWcfgFile" Val="$PPRDIR/test_behav3.wcfg"/>
       </Config>
     </FileSet>
   </FileSets>

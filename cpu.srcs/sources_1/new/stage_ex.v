@@ -23,7 +23,7 @@ module stage_ex (
         func3,
         alu_ctrl
     );
-    assign operand2 = (alu_src == 1'b1) ? read_data2 : imm32;
+    assign operand2 = (alu_src == 1'b0) ? read_data2 : imm32;
     assign zero = (alu_result == 32'b0) ? 1'b1 : 1'b0;
 
     always @(*) begin
