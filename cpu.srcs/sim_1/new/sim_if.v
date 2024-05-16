@@ -1,6 +1,6 @@
 module sim_if ();
     reg clk=0, rst=1;
-    wire branch=0, zero=0;
+    wire branch=0, zero=0, Jump=0;
     wire [31:0] imm=0;
     wire [31:0] instruct;
     wire [31:0] pc;
@@ -12,6 +12,7 @@ module sim_if ();
         .rst(rst),
         .branch(branch),
         .zero(zero),
+        .Jump(Jump),
         .imm(imm),
         .instruct(instruct),
         .pc(pc),

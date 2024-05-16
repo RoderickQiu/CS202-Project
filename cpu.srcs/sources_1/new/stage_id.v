@@ -14,6 +14,7 @@ module stage_id (
     output OIread,
     output OIwrite,
     output Signed,
+    output Jump,
     output [31:0] Reg_out1,
     output [31:0] Reg_out2,
     output [31:0] Imm,
@@ -50,7 +51,8 @@ module stage_id (
         .RegWrite(RegWrite),
         .OIread(OIread),
         .OIwrite(OIwrite),
-        .Signed(Signed)
+        .Signed(Signed),
+        .Jump(Jump)
     );
 
     register REG (  // ID part: Register file

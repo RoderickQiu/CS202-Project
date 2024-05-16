@@ -24,7 +24,7 @@ module cpu (
     wire [3:0] ALUop;
     wire [6:0] func7;
     wire [2:0] func3;
-    wire zero = 0, upg_clk_o = 0;
+    wire zero = 0, upg_clk_o = 0, Jump = 0;
     reg clk, upg_clk;  // the using clock signals
     wire upg_wen_o, upg_done_o;  // uart write out enable, rx data have done
     wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
@@ -89,6 +89,7 @@ module cpu (
         .rst(fpga_rst),
         .branch(Branch),
         .zero(zero),
+        .Jump(Jump),
         .imm(Imm),
         .instruct(Instruction),
         .pc(pc),
