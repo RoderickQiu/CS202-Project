@@ -29,7 +29,7 @@ module vga (
     reg [1:0] count;
     reg [9:0] hcount, vcount;
     wire [7:0] p0[41:0];
-    wire [35:0] data0;
+    reg [35:0] data0;
 
     //control data from val
     always @(posedge clk, posedge rst) begin

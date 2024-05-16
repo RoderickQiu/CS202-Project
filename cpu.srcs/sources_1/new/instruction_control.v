@@ -2,7 +2,7 @@
 
 module instruction_control (
     input [6:0] opcode,
-    input [2:0]funct3,
+    input [2:0] func3,
     input rst,
     input oi,
     output reg Branch,

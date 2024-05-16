@@ -19,9 +19,9 @@ module cpu (
     output hs,
     output vs,
 
-    // 7-Seg ports
+    // 7-Seg ports    
     output [7:0] seg_out,
-    output reg [7:0] tub_sel
+    output [7:0] tub_sel
 );
 
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
@@ -211,10 +211,8 @@ module cpu (
     seg u_seg (
         .rst(fpga_rst),
         .val(Reg_out2[23:0]),
-        .seg_out0(seg_out0),
-        .tub_sel0(tub_sel0),
-        .seg_out1(seg_out1),
-        .tub_sel1(tub_sel1)
+        .seg_out(seg_out),
+        .tub_sel(tub_sel)
     );
 
 endmodule
