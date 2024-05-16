@@ -34,15 +34,13 @@ module stage_id (
         .rs2(Reg_id2),
         .rd(Reg_idwr),
         .func7(func7),
-        .func3(func3),
-        .oi(oi)
+        .func3(func3)
     );
 
     instruction_control IC (  // ID part: Instruction control
         .rst(rst),
         .func3(func3),
         .opcode(opcode),
-        .oi(oi),
         .Branch(Branch),
         .Memread(Memread),
         .Memtoreg(Memtoreg),
@@ -50,8 +48,6 @@ module stage_id (
         .Memwrite(Memwrite),
         .ALUSRC(ALUSRC),
         .RegWrite(RegWrite),
-        .OIread(OIread),
-        .OIwrite(OIwrite),
         .Signed(Signed),
         .Jump(Jump)
     );

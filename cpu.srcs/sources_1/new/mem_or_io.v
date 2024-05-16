@@ -2,8 +2,11 @@
 `include "define.v"
 
 module mem_or_io (
-    input oi_read,
-    input oi_write,
+    input mem_read,
+    input mem_write,
+
+    output reg oi_read,
+    output reg oi_write,
     input [13:0]alu_result_addr,
     output reg [2:0]led_control,
     // output Result  // data to register
@@ -18,14 +21,18 @@ module mem_or_io (
     // assign switch_ctrl = io_read ? 1'b1 : 1'b0;
 
     always @(*) begin
-        if (oi_read && alu_result_addr[13:2]==`SWITCH_MEM) begin
+        if (mem_read && alu_result_addr[13:2]==`SWITCH_MEM) begin
+            oi_read=1'b1;
             switch_control = {alu_result_addr[1:0],1'b1};
         end else begin
+            oi_read=1'b0;
             switch_control = 3'b000;
         end
-        if (oi_write && alu_result_addr[13:2]==`LED_MEM) begin
+        if (mem_write && alu_result_addr[13:2]==`LED_MEM) begin
+            oi_write=1'b1;
             led_control = {alu_result_addr[1:0],1'b1};
         end else begin
+            oi_write=1'b1;
             led_control = 3'b000;
         end
         

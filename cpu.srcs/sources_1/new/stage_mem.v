@@ -5,7 +5,8 @@ module stage_mem (
     input rst,
     input mem_read,
     input mem_write,
-    input oi_write,
+    output oi_read,
+    output oi_write,
     input [2:0]switch_control,
     input [2:0]led_control,
     input [31:0] data_switch,
@@ -22,7 +23,6 @@ module stage_mem (
 
     wire trans_clk;
     assign trans_clk = !clk;
-
     // CPU work on normal mode when kickOff is 1
     // CPU work on Uart communicate mode when kickOff is 0
     wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
@@ -48,6 +48,8 @@ module stage_mem (
     // );
 
     mem_or_io dmemio (
+        .mem_read(mem_read),
+        .mem_write(mem_write),
         .oi_read(oi_read),
         .oi_write(oi_write),
         .alu_result_addr(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),

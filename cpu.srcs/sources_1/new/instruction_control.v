@@ -4,7 +4,6 @@ module instruction_control (
     input [6:0] opcode,
     input [2:0] func3,
     input rst,
-    input oi,
     output reg Branch,
     output reg Memread,
     output reg Memtoreg,
@@ -12,8 +11,6 @@ module instruction_control (
     output reg Memwrite,
     output reg ALUSRC,
     output reg RegWrite,
-    output reg OIread,
-    output reg OIwrite,
     output reg Signed,
     output reg Jump
 );
@@ -27,8 +24,6 @@ module instruction_control (
                     RegWrite = 1'b1;
                     Memread = 1'b0;
                     Memwrite = 1'b0;
-                    OIread = 1'b0;
-                    OIwrite = 1'b0;
                     Branch = 1'b0;
                     Signed=1'b0;
                     ALUop = `ALU_OP_R;
@@ -38,10 +33,8 @@ module instruction_control (
                     ALUSRC   = 1'b1;
                     Memtoreg = 1'b0;
                     RegWrite = 1'b1;
-                    Memread  = !oi;
+                    Memread  = 1'b1;
                     Memwrite = 1'b0;
-                    OIread   = oi;
-                    OIwrite  = 1'b0;
                     Branch   = 1'b0;
                     Signed   = 1'b0;
                     ALUop    = `ALU_OP_I; 
@@ -51,12 +44,10 @@ module instruction_control (
                     ALUSRC = 1'b1;
                     Memtoreg = 1'b1;
                     RegWrite = 1'b1;
-                    Memread = !oi;
+                    Memread = 1'b1;
                     Memwrite = 1'b0;
-                    OIread = oi;
-                    OIwrite = 1'b0;
                     Branch = 1'b0;
-                    Signed=funct3==3'b100 ? 1'b1 :1'b0;
+                    Signed=func3==3'b100 ? 1'b1 :1'b0;
                     ALUop = `ALU_OP_LW;
                     Jump = 1'b0;
                 end
@@ -66,8 +57,6 @@ module instruction_control (
                     RegWrite = 1'b0;
                     Memread = 1'b0;
                     Memwrite = 1'b1;
-                    OIread = 1'b0;
-                    OIwrite = oi;
                     Branch = 1'b0;
                     Signed=1'b0;
                     ALUop = `ALU_OP_SW;
@@ -79,8 +68,6 @@ module instruction_control (
                     RegWrite = 1'b0;
                     Memread = 1'b0;
                     Memwrite = 1'b0;
-                    OIread = 1'b0;
-                    OIwrite = 1'b0;
                     Branch = 1'b1;
                     Signed=1'b0;
                     ALUop = `ALU_OP_B;
@@ -92,8 +79,6 @@ module instruction_control (
                     RegWrite = 1'b0;
                     Memread = 1'b0;
                     Memwrite = 1'b0;
-                    OIread = 1'b0;
-                    OIwrite = 1'b0;
                     Branch = 1'b0;
                     Signed=1'b0;
                     ALUop = `ALU_OP_J;
@@ -105,8 +90,6 @@ module instruction_control (
                     RegWrite = 1'b1;
                     Memread = 1'b0;
                     Memwrite = 1'b0;
-                    OIread = 1'b0;
-                    OIwrite = 1'b0;
                     Branch = 1'b0;
                     Signed=1'b0;
                     ALUop = `ALU_OP_LUI;
@@ -127,8 +110,6 @@ module instruction_control (
             Memwrite = 1'b0;
             ALUSRC = 1'b0;
             RegWrite = 1'b0;
-            OIread = 1'b0;
-            OIwrite = 1'b0;
             Signed=1'b0;
             Jump = 1'b0;
         end
