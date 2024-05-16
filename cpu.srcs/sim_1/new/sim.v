@@ -2,7 +2,7 @@
 module test ();
     reg clk = 0, fpga_rst = 1, start_pg = 0, rx = 0;
     reg [23:0] switch2N4 = 1024;
-    wire [23:0] led2N4 = 0;
+    wire [23:0] led2N4 ;
     wire tx = 0;
     wire [3:0] key_row = 4'b0, key_col = 4'b0;
     wire [3:0] r , g,b;
@@ -28,10 +28,10 @@ module test ();
         .vs(vs)
     );
     always begin
-        #10 clk = !clk;
+        #20 clk = !clk;
     end
     initial begin
-        #100 begin
+        #200 begin
             fpga_rst = 0;
             switch2N4 = 24'b00100000_1110_1110_1101_0000;
         end

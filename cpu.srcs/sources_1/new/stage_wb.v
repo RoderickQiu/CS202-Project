@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 `include "define.v"
 module stage_wb (
+    input clk,
     input mem_to_reg,
     output reg [31:0] read_data,
     input oiread,
@@ -12,14 +13,8 @@ module stage_wb (
     input [31:0] tmp_data
 );
 
-    always @(*) begin
-       if(switch_control)begin
-            read_data=sw_data;
-        end if (mem_to_reg) begin
-            read_data = tmp_data;
-        end else begin
-            read_data = mem_write_addr;
-        end
+    always @(posedge clk) begin
+       
     end
 
 endmodule

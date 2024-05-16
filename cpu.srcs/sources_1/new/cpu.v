@@ -24,7 +24,7 @@ module cpu (
     output [7:0] tub_sel
 );
 
-    wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
+    wire [31:0] Reg_out1, Reg_out2,  Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
     wire Branch , Memread , Memtoreg , Memwrite , ALUSRC, RegWrite , Signed ;
     wire oiread , oiwrite ;
@@ -113,7 +113,10 @@ module cpu (
         .clk(clk),
         .rst(fpga_rst),
         .Instruction(Instruction),
-        .Reg_con(Reg_con),
+        .mem_write_addr(Result),
+        .tmp_data(Reg_tmp),
+        .sw_data(data_switch),
+        .switch_control(switch_control),
         .Branch(Branch),
         .Memread(Memread),
         .Memtoreg(Memtoreg),
@@ -167,23 +170,23 @@ module cpu (
     );
 
     // WB part: Write back
-    stage_wb WB (
-        .mem_to_reg(Memtoreg),
-        .read_data(Reg_con),
-        .oiread(oiread),
-        .oiwrite(oiwrite),
-        .switch_control(switch_control),
-        .led_control(led_control),
-        .sw_data(data_switch),
-        .mem_write_addr(Result),
-        .tmp_data(Reg_tmp)
-    );
+    // stage_wb WB (
+    //     .mem_to_reg(Memtoreg),
+    //     .read_data(Reg_con),
+    //     .oiread(oiread),
+    //     .oiwrite(oiwrite),
+    //     .switch_control(switch_control),
+    //     .led_control(led_control),
+    //     .sw_data(data_switch),
+    //     .mem_write_addr(Result),
+    //     .tmp_data(Reg_tmp)
+    // );
 
     led u_led (
         .clk(clk),
         .rst(fpga_rst),
         .led_control(led_control),
-        .ledwdata(Reg_out2[23:0]),
+        .ledwdata(Reg_out1[23:0]),
         .ledout(led2N4)
     );
 

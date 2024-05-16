@@ -3,7 +3,10 @@ module stage_id (
     input clk,
     input rst,
     input [31:0] Instruction,
-    input [31:0] Reg_con,
+    input [31:0] mem_write_addr,
+    input [31:0] tmp_data,
+    input [31:0] sw_data,
+    input [2:0]switch_control,
     output Branch,
     output Memread,
     output Memtoreg,
@@ -36,7 +39,7 @@ module stage_id (
     );
 
     instruction_control IC (  // ID part: Instruction control
-        .clk(clk),
+
         .rst(rst),
         .func3(func3),
         .opcode(opcode),
@@ -55,12 +58,15 @@ module stage_id (
         .id1(Reg_id1),
         .id2(Reg_id2),
         .idwr(Reg_idwr),
-        .con(Reg_con),
         .RegWrite(RegWrite),
         .clk(clk),
         .rst(rst),
+        .switch_control(switch_control),
+        .mem_to_reg(Memtoreg),
+        .mem_write_addr(mem_write_addr),
+        .tmp_data(tmp_data),
+        .sw_data(sw_data),
         .rd1(Reg_out1),
         .rd2(Reg_out2)
     );
-
 endmodule

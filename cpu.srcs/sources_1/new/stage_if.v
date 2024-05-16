@@ -17,11 +17,13 @@ module stage_if (
     input [31:0] upg_dat_i,  // UPG write data
     input upg_done_i  // 1 if program finish
 );
+    wire trans_clk;
+    assign trans_clk = !clk;
     reg [31:0] next_pc;
     wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
 
     prgrom urom (
-        .clka(kickOff ? clk : upg_clk_i),
+        .clka(kickOff ? trans_clk : upg_clk_i),
         .wea(kickOff ? 1'b0 : upg_wen_i),  // write enable
         .addra(kickOff ? pc[15:2] : upg_adr_i[13:0]),  // input wire [13:0] addr
         .dina(kickOff ? 32'h0000_0000 : upg_dat_i),  // input wire [31:0] din
@@ -31,7 +33,7 @@ module stage_if (
     wire [31:0] pc_plus_4;
     assign pc_plus_4 = pc + 4;
 
-    always @(*) begin
+    always @(negedge clk) begin
         if (branch && zero || Jump) begin
             next_pc = pc + imm;
         end else begin

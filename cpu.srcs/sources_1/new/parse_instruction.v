@@ -71,13 +71,13 @@ module parse_instruction (
             `U_TYPE_LUI: begin  // U-type lui
                 rd = instruction[11:7];
                 imm = {
-                    12'b0,instruction[31:12]
+                    instruction[31:12],12'b0
                 };
             end
             `U_TYPE_AUIPC: begin  // U-type auipc
                 rd = instruction[11:7];
                 imm = {
-                    12'b0,instruction[31:12]
+                    instruction[31:12],12'b0
                 };
             end
             `ECALL: begin  //ecall
