@@ -41,7 +41,7 @@ module stage_if (
 
     always @(negedge clk) begin
         if (rst) begin
-            pc <= 32'b0;
+            pc <= -4;
         end else begin
             pc <= next_pc;
         end

@@ -5,6 +5,8 @@ module test ();
     wire [23:0] led2N4 = 0;
     wire tx = 0;
     wire [3:0] key_row = 4'b0, key_col = 4'b0;
+    wire [3:0] r , g,b;
+
     wire [7:0] seg_an, seg_out;
     cpu cpu1 (
         .clk_in(clk),
@@ -13,14 +15,16 @@ module test ();
         // input fpga_rst_i, 
         .switch2N4(switch2N4),
         .led2N4(led2N4),
-        .key_row(key_row),
-        .key_col(key_col),
-        .seg_an(seg_an),
         .seg_out(seg_out),
         // UART ports
         .start_pg(start_pg),
         .rx(rx),
-        .tx(tx)
+        .tx(tx),
+        .r(r),
+        .g(g),
+        .b(b),
+        .hs(hs),
+        .vs(vs)
     );
     always begin
         #10 clk = !clk;
