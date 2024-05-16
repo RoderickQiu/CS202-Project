@@ -30,7 +30,7 @@ module cpu (
     wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
     wire [31:0] upg_dat_o;  // data to prgrom / dmem32
     wire [31:0] data_switch;
-    wire led_control, switch_control;
+    wire [2:0]led_control, switch_control;
     reg [4:0] divider_clk, divider_upg;
     
     initial begin
@@ -113,6 +113,7 @@ module cpu (
         .RegWrite(RegWrite),
         .OIread(oiread),
         .OIwrite(oiwrite),
+        .Signed(Signed),
         .Reg_out1(Reg_out1),
         .Reg_out2(Reg_out2),
         .Imm(Imm),
@@ -142,6 +143,8 @@ module cpu (
         .mem_write(Memwrite),
         .data_switch(data_switch),
         .oi_write(oiwrite),
+        .switch_control(switch_control),
+        .led_control(led_control),
         .mem_write_addr(Result),
         .mem_write_data(Reg_out2),
         .tmp_data(Reg_tmp),
@@ -179,6 +182,7 @@ module cpu (
         .rst(fpga_rst),
         .switch_control(switch_control),
         .switch_rdata(switch2N4),
+        .Signed(Signed),
         .switch_wdata(data_switch)
     );
 

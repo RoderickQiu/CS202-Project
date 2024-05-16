@@ -12,7 +12,8 @@ module instruction_control (
     output reg ALUSRC,
     output reg RegWrite,
     output reg OIread,
-    output reg OIwrite
+    output reg OIwrite,
+    output Signed
 );
 
     always @* begin
@@ -27,6 +28,7 @@ module instruction_control (
                     OIread = 1'b0;
                     OIwrite = 1'b0;
                     Branch = 1'b0;
+                    Signed=1'b0;
                     ALUop = `ALU_OP_R;
                 end
                 `I_TYPE_1: begin
@@ -38,6 +40,7 @@ module instruction_control (
                     OIread   = oi;
                     OIwrite  = 1'b0;
                     Branch   = 1'b0;
+                    Signed=1'b0;
                     //ALUop = 
                 end
                 `I_TYPE_2: begin
@@ -49,6 +52,7 @@ module instruction_control (
                     OIread = oi;
                     OIwrite = 1'b0;
                     Branch = 1'b0;
+                    Signed=funct3==3'b100 ? 1'b1 :1'b0;
                     ALUop = `ALU_OP_LW;
                 end
                 `S_TYPE: begin
@@ -60,6 +64,7 @@ module instruction_control (
                     OIread = 1'b0;
                     OIwrite = oi;
                     Branch = 1'b0;
+                    Signed=1'b0;
                     ALUop = `ALU_OP_SW;
                 end
                 `B_TYPE: begin
@@ -71,6 +76,7 @@ module instruction_control (
                     OIread = 1'b0;
                     OIwrite = 1'b0;
                     Branch = 1'b1;
+                    Signed=1'b0;
                     ALUop = `ALU_OP_BEQ;
                 end
                 `U_TYPE_LUI: begin
@@ -82,6 +88,7 @@ module instruction_control (
                     OIread = 1'b0;
                     OIwrite = 1'b0;
                     Branch = 1'b0;
+                    Signed=1'b0;
                     ALUop = `ALU_OP_LUI;
                 end
                 `U_TYPE_AUIPC: begin
@@ -101,6 +108,7 @@ module instruction_control (
             RegWrite = 1'b0;
             OIread = 1'b0;
             OIwrite = 1'b0;
+            Signed=1'b0;
         end
     end
 

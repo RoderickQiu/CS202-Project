@@ -6,6 +6,8 @@ module stage_mem (
     input mem_read,
     input mem_write,
     input oi_write,
+    input [2:0]switch_control,
+    input [2:0]led_control,
     input [31:0] data_switch,
     input [31:0] mem_write_addr,  // orgininate from ALU
     input [31:0] mem_write_data,
@@ -45,14 +47,12 @@ module stage_mem (
     //     .douta(tmp_out_oi)
     // );
 
-    // mem_or_io dmemio (
-    //     .mem_read(mem_read),
-    //     .mem_write(mem_write),
-    //     .oi_read(oi_read),
-    //     .oi_write(oi_write),
-    //     .alu_result_addr(mem_write_addr),
-    //     .mem_read_data(out_mem),
-    //     .io_read_data(out_oi),
-    //     .data_read_output(tmp_data),
-    // );
+    mem_or_io dmemio (
+        .oi_read(oi_read),
+        .oi_write(oi_write),
+        .alu_result_addr(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),
+        .led_control(led_control),
+        .switch_ctrl(switch_ctrl)
+        // .Result(tmp_data)
+    );
 endmodule

@@ -2,32 +2,33 @@
 `include "define.v"
 
 module mem_or_io (
-    input mem_read,
-    input mem_write,
-    input io_read,
-    input io_write,
-    input [31:0] alu_result_addr,
-    input [31:0] mem_read_data,
-    input [15:0] io_read_data,
-    input [31:0] data_to_write,
-    output [31:0] data_read_output,  // data to register
+    input oi_read,
+    input oi_write,
+    input [13:0]alu_result_addr,
+    output [2:0]led_control,
+    // output Result  // data to register
     // output [31:0] addr_output,  // address to memory
     // output reg [31:0] data_write_output,  // data to memory or io
-    // output led_ctrl,
-    // output switch_ctrl
+    output [2:0]switch_ctrl
 );
 
     // assign addr_output = alu_result_addr;
-    assign data_read_output = mem_read ? mem_read_data : {16'h0000, io_read_data};
+    // assign Result = mem_read ? mem_read_data : {16'h0000, io_read_data};
     // assign led_ctrl = io_write ? 1'b1 : 1'b0;
     // assign switch_ctrl = io_read ? 1'b1 : 1'b0;
 
     always @(*) begin
-        if (mem_write || io_write) begin
-            data_write_output = data_to_write;
+        if (oi_read && alu_result_addr[13:2]==SWITCH_MEM) begin
+            switch_control = {alu_result_addr[1:0],1'b1};
         end else begin
-            data_write_output = 32'b0;
+            switch_control = 3'b000;
         end
+        if (oi_write && alu_result_addr[13:2]==LED_MEM) begin
+            led_control = {alu_result_addr[1:0],1'b1};
+        end else begin
+            led_control = 3'b000;
+        end
+        
     end
 
 endmodule

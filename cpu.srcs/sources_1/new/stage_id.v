@@ -13,6 +13,7 @@ module stage_id (
     output RegWrite,
     output OIread,
     output OIwrite,
+    output Signed,
     output [31:0] Reg_out1,
     output [31:0] Reg_out2,
     output [31:0] Imm,
@@ -48,7 +49,8 @@ module stage_id (
         .ALUSRC(ALUSRC),
         .RegWrite(RegWrite),
         .OIread(OIread),
-        .OIwrite(OIwrite)
+        .OIwrite(OIwrite),
+        .Signed(Signed)
     );
 
     register REG (  // ID part: Register file
