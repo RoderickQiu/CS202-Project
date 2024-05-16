@@ -52,7 +52,7 @@ module stage_mem (
         .oi_write(oi_write),
         .alu_result_addr(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),
         .led_control(led_control),
-        .switch_ctrl(switch_ctrl)
+        .switch_control(switch_control)
         // .Result(tmp_data)
     );
 endmodule

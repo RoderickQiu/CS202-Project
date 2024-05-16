@@ -2,6 +2,7 @@
 
 module instruction_control (
     input [6:0] opcode,
+    input [2:0]funct3,
     input rst,
     input oi,
     output reg Branch,
@@ -13,7 +14,7 @@ module instruction_control (
     output reg RegWrite,
     output reg OIread,
     output reg OIwrite,
-    output Signed
+    output reg Signed
 );
 
     always @* begin
