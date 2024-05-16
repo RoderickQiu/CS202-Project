@@ -110,6 +110,8 @@ module cpu (
 
     // ID part: Instruction decode
     stage_id ID (
+        .clk(clk),
+        .rst(fpga_rst),
         .Instruction(Instruction),
         .Reg_con(Reg_con),
         .Branch(Branch),
@@ -122,6 +124,7 @@ module cpu (
         .OIread(oiread),
         .OIwrite(oiwrite),
         .Signed(Signed),
+        .Jump(Jump),
         .Reg_out1(Reg_out1),
         .Reg_out2(Reg_out2),
         .Imm(Imm),

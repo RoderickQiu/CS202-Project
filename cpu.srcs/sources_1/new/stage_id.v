@@ -40,6 +40,7 @@ module stage_id (
 
     instruction_control IC (  // ID part: Instruction control
         .rst(rst),
+        .func3(func3),
         .opcode(opcode),
         .oi(oi),
         .Branch(Branch),

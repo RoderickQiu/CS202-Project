@@ -39,9 +39,7 @@ module stage_if (
         end
     end
 
-    reg x = 0;
     always @(negedge clk) begin
-        x <= ~x;
         if (rst) begin
             pc <= 32'b0;
         end else begin
