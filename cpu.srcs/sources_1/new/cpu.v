@@ -6,15 +6,22 @@ module cpu (
     input              fpga_rst,
     input       [23:0] switch2N4,
     output wire [23:0] led2N4,
-    input       [ 3:0] key_row,
-    output      [ 3:0] key_col,
-    output      [ 7:0] seg_an,
-    output      [ 7:0] seg_out,
 
     // UART ports
     input  start_pg,
     input  rx,
-    output tx
+    output tx,
+
+    // VGA ports
+    output [3:0] r,
+    output [3:0] g,
+    output [3:0] b,
+    output hs,
+    output vs,
+
+    // 7-Seg ports
+    output [7:0] seg_out,
+    output reg [7:0] tub_sel
 );
 
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
@@ -30,14 +37,14 @@ module cpu (
     wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
     wire [31:0] upg_dat_o;  // data to prgrom / dmem32
     wire [31:0] data_switch;
-    wire [2:0]led_control, switch_control;
+    wire [2:0] led_control, switch_control;
     reg [4:0] divider_clk, divider_upg;
-    
+
     initial begin
         divider_clk = 0;
-        divider_upg = 0;   
+        divider_upg = 0;
         clk = 0;
-        upg_clk = 0;    
+        upg_clk = 0;
     end
 
     always @(posedge clk_in) begin
@@ -65,7 +72,7 @@ module cpu (
     reg upg_rst;
     always @(posedge clk) begin
         if (spg_bufg) upg_rst = 0;
-        if (fpga_rst) begin // the main reset
+        if (fpga_rst) begin  // the main reset
             upg_rst = 1;
         end
     end
@@ -187,13 +194,24 @@ module cpu (
         .switch_wdata(data_switch)
     );
 
-    key_and_7seg u_key (
+    vga u_vga (
         .clk(clk),
         .rst(fpga_rst),
-        .key_row(key_row),
-        .key_col(key_col),
-        .seg_an(seg_an),
-        .seg_out(seg_out)
+        .val(Reg_out2[23:0]),
+        .r  (r),
+        .g  (g),
+        .b  (b),
+        .hs (hs),
+        .vs (vs)
+    );
+
+    seg u_seg (
+        .rst(fpga_rst),
+        .val(Reg_out2[23:0]),
+        .seg_out0(seg_out0),
+        .tub_sel0(tub_sel0),
+        .seg_out1(seg_out1),
+        .tub_sel1(tub_sel1)
     );
 
 endmodule
