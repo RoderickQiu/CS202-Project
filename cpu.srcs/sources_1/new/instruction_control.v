@@ -36,7 +36,7 @@ module instruction_control (
                 end
                 `I_TYPE_1: begin
                     ALUSRC   = 1'b1;
-                    Memtoreg = 1'b1;
+                    Memtoreg = 1'b0;
                     RegWrite = 1'b1;
                     Memread  = !oi;
                     Memwrite = 1'b0;
@@ -89,12 +89,12 @@ module instruction_control (
                 `J_TYPE: begin
                     ALUSRC = 1'b1;
                     Memtoreg = 1'b0;
-                    RegWrite = 1'b1;
+                    RegWrite = 1'b0;
                     Memread = 1'b0;
                     Memwrite = 1'b0;
                     OIread = 1'b0;
                     OIwrite = 1'b0;
-                    Branch = 1'b1;
+                    Branch = 1'b0;
                     Signed=1'b0;
                     ALUop = `ALU_OP_J;
                     Jump = 1'b1;

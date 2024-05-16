@@ -32,6 +32,7 @@ module parse_instruction (
                 rd = instruction[11:7];
                 func3 = instruction[14:12];
                 rs1 = instruction[19:15];
+                imm = {{20{instruction[31]}}, instruction[31:20]};
             end
             `I_TYPE_2: begin  // I-type 2
                 rd = instruction[11:7];
@@ -50,12 +51,12 @@ module parse_instruction (
                 rs1 = instruction[19:15];
                 rs2 = instruction[24:20];
                 imm = {
-                    {18{instruction[31]}},
+                    {19{instruction[31]}},
                     instruction[31],
                     instruction[7],
                     instruction[30:25],
                     instruction[11:8],
-                    instruction[7], 1'b0
+                    1'b0
                 };
             end
             `J_TYPE: begin // J-type
@@ -74,14 +75,17 @@ module parse_instruction (
             end
             `U_TYPE_AUIPC: begin  // U-type auipc
                 rd = instruction[11:7];
-                imm[31:12] = instruction[31:12];
+                imm = {
+                    {12{instruction[31]}},
+                    instruction[31:12]
+                };
             end
             `ECALL: begin  //ecall
                 func3 = 3'b000;
                 imm   = 0;
             end
         endcase
-        oi = (imm[31:10] == 22'b0000_0000_0000_0000_0000_00) ? 1'b1 : 1'b0;
+        oi = (imm[15:10] == 6'b111111) ? 1'b1 : 1'b0;
     end
 
 endmodule
