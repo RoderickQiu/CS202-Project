@@ -38,6 +38,7 @@ module stage_id (
     );
 
     instruction_control IC (  // ID part: Instruction control
+        .clk(clk),
         .rst(rst),
         .func3(func3),
         .opcode(opcode),

@@ -26,7 +26,7 @@ module cpu (
 
     wire [31:0] Reg_out1, Reg_out2, Reg_con, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
-    wire Branch = 0, Memread = 0, Memtoreg = 0, Memwrite = 0, ALUSRC = 0, RegWrite = 0;
+    wire Branch = 0, Memread = 0, Memtoreg = 0, Memwrite = 0, ALUSRC = 0, RegWrite = 0, Signed = 0;
     wire oiread = 0, oiwrite = 0;
     wire [3:0] ALUop;
     wire [6:0] func7;
@@ -208,6 +208,7 @@ module cpu (
     );
 
     seg u_seg (
+        .clk(clk),
         .rst(fpga_rst),
         .val(Reg_out2[23:0]),
         .seg_out(seg_out),

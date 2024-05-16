@@ -7,8 +7,8 @@ module stage_mem (
     input mem_write,
     output oi_read,
     output oi_write,
-    input [2:0]switch_control,
-    input [2:0]led_control,
+    input [2:0] switch_control,
+    input [2:0] led_control,
     input [31:0] data_switch,
     input [31:0] mem_write_addr,  // orgininate from ALU
     input [31:0] mem_write_data,
@@ -16,7 +16,7 @@ module stage_mem (
     input upg_rst_i,  // UPG reset (Active High)
     input upg_clk_i,  // UPG ram_clk_i (10MHz)
     input upg_wen_i,  // UPG write enable
-    input [13:0] upg_adr_i,  // UPG write address
+    input [14:0] upg_adr_i,  // UPG write address
     input [31:0] upg_dat_i,  // UPG write data
     input upg_done_i  // 1 if programming is finished
 );
@@ -27,13 +27,13 @@ module stage_mem (
     // CPU work on Uart communicate mode when kickOff is 0
     wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
 
-    wire [31:0]out_mem;
-    wire [15:0]out_oi;
-    wire write=mem_write|oi_write;
+    wire [31:0] out_mem;
+    wire [15:0] out_oi;
+    wire write = mem_write | oi_write;
     dmem32 dmem (
         .clka (kickOff ? trans_clk : upg_clk_i),
         .wea  (kickOff ? write : upg_wen_i),
-        .addra(kickOff ? mem_write_addr[15:2] : upg_adr_i),
+        .addra(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),
         .dina (kickOff ? write : upg_dat_i),
         .douta(out_mem)
     );
