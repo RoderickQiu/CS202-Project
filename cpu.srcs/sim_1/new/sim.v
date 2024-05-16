@@ -6,7 +6,8 @@ module test ();
     wire tx = 0;
     wire [3:0] key_row = 4'b0, key_col = 4'b0;
     wire [3:0] r , g,b;
-
+    wire x,xx,xxx;
+    assign {x,xx,xxx}=3'b100;
     wire [7:0] seg_an, seg_out;
     cpu cpu1 (
         .clk_in(clk),

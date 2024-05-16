@@ -11,8 +11,6 @@ module stage_id (
     output Memwrite,
     output ALUSRC,
     output RegWrite,
-    output OIread,
-    output OIwrite,
     output Signed,
     output Jump,
     output [31:0] Reg_out1,
@@ -24,7 +22,7 @@ module stage_id (
 
     wire [4:0] Reg_id1, Reg_id2, Reg_idwr;
     wire [6:0] opcode;
-    wire zero, oi;
+    wire zero;
 
     parse_instruction PI (  // ID Part: Parse the instruction
         .instruction(Instruction),

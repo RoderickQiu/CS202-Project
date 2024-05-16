@@ -23,16 +23,16 @@ module mem_or_io (
     always @(*) begin
         if (mem_read && alu_result_addr[13:2]==`SWITCH_MEM) begin
             oi_read=1'b1;
-            switch_control = {alu_result_addr[1:0],1'b1};
+            switch_control = {1'b1,alu_result_addr[1:0]};
         end else begin
             oi_read=1'b0;
             switch_control = 3'b000;
         end
         if (mem_write && alu_result_addr[13:2]==`LED_MEM) begin
             oi_write=1'b1;
-            led_control = {alu_result_addr[1:0],1'b1};
+            led_control = {1'b1,alu_result_addr[1:0]};
         end else begin
-            oi_write=1'b1;
+            oi_write=1'b0;
             led_control = 3'b000;
         end
         
