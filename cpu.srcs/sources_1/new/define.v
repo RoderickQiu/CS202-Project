@@ -11,12 +11,10 @@
 
 `define ALU_OP_LW 3'b000
 `define ALU_OP_SW 3'b000
-`define ALU_OP_BEQ 3'b001
+`define ALU_OP_B 3'b001
 `define ALU_OP_R 3'b010
 `define ALU_OP_LUI 3'b011
 `define ALU_OP_AUIPC 3'b100
-`define ALU_OP_B_SIGNED 3'b101
-`define ALU_OP_B_UNSIGNED 3'b110
 
 `define R_TYPE 7'b0110011
 `define I_TYPE_1 7'b0010011

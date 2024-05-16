@@ -77,7 +77,7 @@ module instruction_control (
                     OIwrite = 1'b0;
                     Branch = 1'b1;
                     Signed=1'b0;
-                    ALUop = `ALU_OP_BEQ;
+                    ALUop = ALU_OP_B;
                 end
                 `U_TYPE_LUI: begin
                     ALUSRC = 1'b1;
