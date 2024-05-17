@@ -9,25 +9,25 @@ module seg_char_set (
 
     always @* begin
         if (rst) begin
-            seg_out = 8'b1111_1100;  //0
+            seg_out = 8'b11000000;  //0
         end else begin
             case (sw)
-                4'h0: seg_out = 8'b1111_1100;  //0
-                4'h1: seg_out = 8'b0110_0000;  //1
-                4'h2: seg_out = 8'b1101_1010;  //2
-                4'h3: seg_out = 8'b1111_0010;  //3
-                4'h4: seg_out = 8'b0110_0110;  //4
-                4'h5: seg_out = 8'b1011_0110;  //5
-                4'h6: seg_out = 8'b1011_1110;  //6
-                4'h7: seg_out = 8'b1110_0000;  //7
-                4'h8: seg_out = 8'b1111_1110;  //8
-                4'h9: seg_out = 8'b1110_0110;  //9
-                4'ha: seg_out = 8'b1110_1110;  //A
-                4'hb: seg_out = 8'b0011_1110;  //B
-                4'hc: seg_out = 8'b1001_1100;  //C
-                4'hd: seg_out = 8'b0111_1010;  //D
-                4'he: seg_out = 8'b1001_1110;  //E
-                4'hf: seg_out = 8'b0000_0000;  //F represents space
+                4'b0000: seg_out <= 8'b11000000;  //  0
+                4'b0001: seg_out <= 8'b11111001;  //  1
+                4'b0010: seg_out <= 8'b10100100;  //  2
+                4'b0011: seg_out <= 8'b10110000;  //  3
+                4'b0100: seg_out <= 8'b10011001;  //  4
+                4'b0101: seg_out <= 8'b10010010;  //  5
+                4'b0110: seg_out <= 8'b10000010;  //  6
+                4'b0111: seg_out <= 8'b11111000;  //  7
+                4'b1000: seg_out <= 8'b10000000;  //  8
+                4'b1001: seg_out <= 8'b10010000;  //  9
+                4'b1010: seg_out <= 8'b10001000;  //  A
+                4'b1011: seg_out <= 8'b10000011;  //  b
+                4'b1100: seg_out <= 8'b11000110;  //  C
+                4'b1101: seg_out <= 8'b10100001;  //  d
+                4'b1110: seg_out <= 8'b10000110;  //  E
+                4'b1111: seg_out <= 8'b11111111;  //  F  
                 default: seg_out = 8'b0000_0001;
             endcase
         end
