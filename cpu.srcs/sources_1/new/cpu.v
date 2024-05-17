@@ -31,14 +31,14 @@ module cpu (
     wire [3:0] ALUop;
     wire [6:0] func7;
     wire [2:0] func3;
-    wire zero , upg_clk_o , Jump ;
+    wire zero , upg_clk_o , Jump ,rst_in;
     reg clk, upg_clk;  // the using clock signals
     wire upg_wen_o, upg_done_o;  // uart write out enable, rx data have done
     wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
     wire [31:0] upg_dat_o;  // data to prgrom / dmem32
     wire [31:0] data_switch;
     wire [2:0] led_control, switch_control;
-    reg [4:0] divider_clk, divider_upg;
+    reg [25:0] divider_clk, divider_upg;
 
     initial begin
         divider_clk = 0;
@@ -76,7 +76,7 @@ module cpu (
             upg_rst = 1;
         end
     end
-
+    assign rst_in =fpga_rst | !upg_rst;
     uart_bmpg_0 uart (
         .upg_clk_i(upg_clk),
         .upg_rst_i(upg_rst),
@@ -93,7 +93,7 @@ module cpu (
     // IF part: Instruction fetch
     stage_if IF (
         .clk(clk),
-        .rst(fpga_rst),
+        .rst(rst_in),
         .branch(Branch),
         .zero(zero),
         .Jump(Jump),
@@ -111,7 +111,7 @@ module cpu (
     // ID part: Instruction decode
     stage_id ID (
         .clk(clk),
-        .rst(fpga_rst),
+        .rst(rst_in),
         .Instruction(Instruction),
         .mem_write_addr(Result),
         .tmp_data(Reg_tmp),
@@ -150,7 +150,7 @@ module cpu (
     // MEM part: Data memory
     stage_mem MEM (
         .clk(clk),
-        .rst(fpga_rst),
+        .rst(rst_in),
         .mem_read(Memread),
         .mem_write(Memwrite),
         .data_switch(data_switch),
@@ -184,15 +184,19 @@ module cpu (
 
     led u_led (
         .clk(clk),
-        .rst(fpga_rst),
+        .rst(rst_in),
+        .fpga_rst(fpga_rst),
+        .upg_rst(upg_rst),
+        .pc(pc),
         .led_control(led_control),
-        .ledwdata(Reg_out2[23:0]),
+        .ledout_w(Reg_out2[23:16]),
+        .ledwdata(Reg_out2[15:0]),
         .ledout(led2N4)
     );
 
     switch u_sw (
         .clk(clk),
-        .rst(fpga_rst),
+        .rst(rst_in),
         .switch_control(switch_control),
         .switch_rdata(switch2N4),
         .Signed(Signed),
@@ -200,9 +204,9 @@ module cpu (
     );
 
     vga u_vga (
-        .clk(clk),
-        .rst(fpga_rst),
-        .val(Reg_out2[23:0]),
+        .clk(clk_in),
+        .rst(rst_in),
+        .val(led2N4),
         .r  (r),
         .g  (g),
         .b  (b),
@@ -211,9 +215,9 @@ module cpu (
     );
 
     seg u_seg (
-        .clk(clk),
-        .rst(fpga_rst),
-        .val(Reg_out2[23:0]),
+        .clk(clk_in),
+        .rst(rst_in),
+        .val(led2N4),
         .seg_out(seg_out),
         .tub_sel(tub_sel)
     );

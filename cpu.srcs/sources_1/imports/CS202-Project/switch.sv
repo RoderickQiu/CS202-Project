@@ -10,8 +10,7 @@ module switch (
     assign switch_wdata = sw_data;
     always @(*) begin
         if (rst) begin
-            // sw_data = 0;+
-            
+            sw_data = 0;
         end else if (switch_control==3'b100) begin
             sw_data=switch_rdata;
         end else if (switch_control==3'b101&&Signed==1'b0) begin
