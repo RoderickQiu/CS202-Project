@@ -15,7 +15,7 @@ module instruction_control (
     output reg Signed,
     output reg Jump
 );
-
+    
     always @(*) begin
         if (!rst) begin
             case (opcode)
@@ -34,7 +34,7 @@ module instruction_control (
                     ALUSRC   = 1'b1;
                     Memtoreg = 1'b0;
                     RegWrite = 1'b1;
-                    Memread  = 1'b1;
+                    Memread  = 1'b0;
                     Memwrite = 1'b0;
                     Branch   = 1'b0;
                     Signed   = 1'b0;

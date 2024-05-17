@@ -48,6 +48,7 @@ module stage_mem (
     // );
 
     mem_or_io dmemio (
+        // .clk(clk),
         .mem_read(mem_read),
         .mem_write(mem_write),
         .oi_read(oi_read),

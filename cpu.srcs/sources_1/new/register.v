@@ -18,8 +18,10 @@ module register (
 );
     reg [31:0] Reg[31:0];
     integer i;
+    wire [31:0]Check;
     assign rd1 = Reg[id1];
     assign rd2 = Reg[id2];
+    assign Check = Reg[idwr];
 
     always @(negedge clk) begin
         if (rst) begin
@@ -28,10 +30,12 @@ module register (
                 else Reg[i] <= 0;
             end
         end
+    end
+    always @(negedge clk) begin
         if (RegWrite && idwr != 5'b00000) begin
-            if(switch_control)begin
+            if(switch_control!=3'b000)begin
                 Reg[idwr] <=sw_data;
-            end if (mem_to_reg) begin
+            end else if (mem_to_reg) begin
                 Reg[idwr] <= tmp_data;
             end else begin
                 Reg[idwr] <= mem_write_addr;

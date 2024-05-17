@@ -186,7 +186,7 @@ module cpu (
         .clk(clk),
         .rst(fpga_rst),
         .led_control(led_control),
-        .ledwdata(Reg_out1[23:0]),
+        .ledwdata(Reg_out2[23:0]),
         .ledout(led2N4)
     );
 

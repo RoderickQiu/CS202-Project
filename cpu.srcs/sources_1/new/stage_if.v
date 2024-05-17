@@ -18,7 +18,7 @@ module stage_if (
     input upg_done_i  // 1 if program finish
 );
     wire trans_clk;
-    assign trans_clk = !clk;
+    assign trans_clk = clk;
     reg [31:0] next_pc;
     wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
 
