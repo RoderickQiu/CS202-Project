@@ -61,6 +61,11 @@ Temporary Items
 #Exclude all
 *
 !scenario/
+!tools/
+!*.py
+!*.h
+!*.cpp
+!*.c
 !*.asm
 !*/
 !.gitignore
