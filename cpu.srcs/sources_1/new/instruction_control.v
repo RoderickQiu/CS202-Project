@@ -97,7 +97,15 @@ module instruction_control (
                     Jump = 1'b0;
                 end
                 `U_TYPE_AUIPC: begin
-                    //ToDo
+                    ALUSRC = 1'b1;
+                    Memtoreg = 1'b0;
+                    RegWrite = 1'b1;
+                    Memread = 1'b0;
+                    Memwrite = 1'b0;
+                    Branch = 1'b0;
+                    Signed = 1'b0;
+                    ALUop = `ALU_OP_AUIPC;
+                    Jump = 1'b0;
                 end
                 `ECALL: begin
                     //ToDo
