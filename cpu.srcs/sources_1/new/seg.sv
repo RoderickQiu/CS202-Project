@@ -14,17 +14,17 @@ module seg (
     logic [31:0] cnt; 
     logic [ 2:0] divider_clk; 
     logic [ 7:0] seg_in;  
-    logic rst_n;
+    // logic rst_n;
     parameter period = `seg_val_freq; 
-    assign p0 = val[3:0];
-    assign p1 = val[7:4];
-    assign p2 = val[11:8];
-    assign p3 = val[15:12];
-    assign p4 = val[19:16];
-    assign p5 = val[23:20];
-    assign p6 = val[27:24];
-    assign p7 = val[31:28];
-    assign rst_n = ~rst;
+    assign p7 = val[3:0];
+    assign p6 = val[7:4];
+    assign p5 = val[11:8];
+    assign p4 = val[15:12];
+    assign p3 = val[19:16];
+    assign p2 = val[23:20];
+    assign p1 = val[27:24];
+    assign p0 = val[31:28];
+    // assign rst_n = ~rst;
 
     always_comb begin
         case (seg_in)
@@ -48,8 +48,8 @@ module seg (
         endcase
     end
 
-    always @(posedge clk, negedge rst_n) begin
-        if (!rst_n) begin
+    always @(posedge clk, posedge rst) begin
+        if (rst) begin
             clk_slow <= 0;
             cnt <= 0;
         end else begin
@@ -62,8 +62,8 @@ module seg (
         end
     end
 
-    always @(posedge clk_slow, negedge rst_n) begin
-        if (!rst_n) begin
+    always @(posedge clk_slow, posedge rst) begin
+        if (rst) begin
             divider_clk <= 0;
         end else begin
             if (divider_clk == 3'd7) begin

@@ -33,14 +33,14 @@ module stage_if (
     wire [31:0] pc_plus_4;
     assign pc_plus_4 = pc + 4;
 
-    always @(negedge clk) begin
+
+    always @(posedge clk) begin
         if (branch && zero || Jump) begin
-            next_pc = pc + imm;
+            next_pc <= pc + imm;
         end else begin
-            next_pc = pc_plus_4;
+            next_pc <= pc_plus_4;
         end
     end
-
     always @(negedge clk) begin
         if (rst) begin
             pc <= -4;

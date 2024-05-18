@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
 module stage_id (
+    output [31:0]Check,
     input clk,
     input rst,
     input [31:0] Instruction,
@@ -55,6 +56,7 @@ module stage_id (
     );
 
     register REG (  // ID part: Register file
+        .Check(Check),
         .id1(Reg_id1),
         .id2(Reg_id2),
         .idwr(Reg_idwr),

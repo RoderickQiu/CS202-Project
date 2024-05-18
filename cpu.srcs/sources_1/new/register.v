@@ -2,6 +2,7 @@
 `include "define.v"
 
 module register (
+    output  [31:0]Check,
     input [4:0] id1,
     input [4:0] id2,
     input [4:0] idwr,
@@ -18,28 +19,38 @@ module register (
 );
     reg [31:0] Reg[31:0];
     integer i;
-    wire [31:0]Check;
-    assign rd1 = Reg[id1];
-    assign rd2 = Reg[id2];
-    assign Check = Reg[idwr];
+    // wire [31:0]Check;
 
-    always @(negedge clk) begin
+    reg [31:0] w_data;
+    reg [4:0] pre;
+    
+    always @(*)begin
+        if(switch_control!=3'b000)begin
+            w_data =sw_data;
+        end else if (mem_to_reg) begin
+            w_data= tmp_data;
+        end else begin
+            w_data= mem_write_addr;
+        end
+    end
+    always @(*)begin
+        pre=idwr;
+    end
+
+    // always @(posedge clk) begin
+    assign    rd1 = Reg[id1];
+    assign    rd2 = Reg[id2];
+    // end
+    assign    Check = {Reg[id2][31:4],id2[3:0]};    
+    always @(posedge clk) begin
         if (rst) begin
             for (i = 0; i < 32; i = i + 1) begin
                 if (i == 1) Reg[i] <= `SP_REG_INITIAL;
                 else Reg[i] <= 0;
             end
+        end else if (RegWrite && idwr != 5'b00000) begin
+            Reg[pre] <=w_data;
         end
-    end
-    always @(negedge clk) begin
-        if (RegWrite && idwr != 5'b00000) begin
-            if(switch_control!=3'b000)begin
-                Reg[idwr] <=sw_data;
-            end else if (mem_to_reg) begin
-                Reg[idwr] <= tmp_data;
-            end else begin
-                Reg[idwr] <= mem_write_addr;
-            end
-        end
+        // pre<=idwr;
     end
 endmodule

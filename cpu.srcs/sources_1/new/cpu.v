@@ -51,7 +51,7 @@ module cpu (
         divider_clk <= divider_clk + 1;
         if (divider_clk == 3) begin
             clk <= ~clk;
-            divider_clk <= 0;
+            // divider_clk <= 0;
         end
     end
 
@@ -107,9 +107,10 @@ module cpu (
         .upg_dat_i(upg_dat_o),
         .upg_done_i(upg_done_o)
     );
-
+wire [31:0]Check;
     // ID part: Instruction decode
     stage_id ID (
+        .Check(Check),
         .clk(clk),
         .rst(rst_in),
         .Instruction(Instruction),
@@ -154,8 +155,6 @@ module cpu (
         .mem_read(Memread),
         .mem_write(Memwrite),
         .data_switch(data_switch),
-        .oi_read(oiread),
-        .oi_write(oiwrite),
         .switch_control(switch_control),
         .led_control(led_control),
         .mem_write_addr(Result),
@@ -185,13 +184,11 @@ module cpu (
     led u_led (
         .clk(clk),
         .rst(rst_in),
-        .fpga_rst(fpga_rst),
-        .upg_rst(upg_rst),
-        .pc(pc),
+        .control({switch_control,led_control}),
         .led_control(led_control),
-        .ledout_w(Reg_out2[23:16]),
-        .ledwdata(Reg_out2[15:0]),
-        .ledout(led2N4)
+        .ledwdata(Reg_out2),
+        .ledout_w(led2N4[23:16]),
+        .ledout(led2N4[15:0])
     );
 
     switch u_sw (
@@ -217,7 +214,7 @@ module cpu (
     seg u_seg (
         .clk(clk_in),
         .rst(rst_in),
-        .val(led2N4),
+        .val(pc),
         .seg_out(seg_out),
         .tub_sel(tub_sel)
     );
