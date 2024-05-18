@@ -33,7 +33,7 @@ module test ();
     initial begin
         #200 begin
             fpga_rst = 0;
-            switch2N4 = 24'b00100000_1110_1110_1101_0000;
+            switch2N4 = 24'b00000000_1000_0000_1010_0000;
         end
     end
 

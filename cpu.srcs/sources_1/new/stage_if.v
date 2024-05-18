@@ -34,11 +34,18 @@ module stage_if (
     assign pc_plus_4 = pc + 4;
 
 
-    always @(posedge clk) begin
-        if (branch && zero || Jump) begin
-            next_pc <= pc + imm;
+    // always @(posedge clk) begin
+    //     if ((branch && zero) || Jump) begin
+    //         next_pc <= pc + imm;
+    //     end else begin
+    //         next_pc <= pc_plus_4;
+    //     end
+    // end
+    always @(*) begin
+        if ((branch && zero) || Jump) begin
+            next_pc = pc + imm;
         end else begin
-            next_pc <= pc_plus_4;
+            next_pc = pc_plus_4;
         end
     end
     always @(negedge clk) begin

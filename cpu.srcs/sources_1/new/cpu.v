@@ -51,7 +51,7 @@ module cpu (
         divider_clk <= divider_clk + 1;
         if (divider_clk == 3) begin
             clk <= ~clk;
-            // divider_clk <= 0;
+            divider_clk <= 0;
         end
     end
 
@@ -70,7 +70,7 @@ module cpu (
     );
 
     reg upg_rst;
-    always @(posedge clk) begin
+    always @(posedge clk_in) begin
         if (spg_bufg) upg_rst = 0;
         if (fpga_rst) begin  // the main reset
             upg_rst = 1;
