@@ -11,7 +11,7 @@
 	Switch: .word 0xfffffc00
 	Led: .word 0xfffffc10
 .text
-Calc:
+Calc6:
  	lui t2, 0x1
     lui s0, 0xfffff
     addi s0, s0, -1024

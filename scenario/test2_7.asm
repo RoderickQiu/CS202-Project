@@ -29,7 +29,7 @@ main:
     	sgt a3, a0, t2
     	and a4, a2, a3
     	add t6, t6, a4
-    	bnez a2, loopt5
+    	bnez a2, loop
     addi a0, a6, 0
     sw a0, 0(s1)
 solve:
