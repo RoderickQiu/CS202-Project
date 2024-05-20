@@ -11,12 +11,7 @@
     lui t1, 0xfffff
     addi t1, t1, -1008
     add t1, t1, t2
-    #la a0, Switch
-    #la a1, Led
-    #lw t0, 0(a0)
-    #lw t1, 0(a1)
-    #t0 the address of Switch 
-    #t1 the address of Led
+    
 b0_010:
 	addi t2, t0, 4
 	lbu t3, 0(t2) # read a
