@@ -51,7 +51,7 @@ module cpu (
         divider_clk <= divider_clk + 1;
         if (divider_clk == 3) begin
             clk <= ~clk;
-            divider_clk <= 0;
+            // divider_clk <= 0;
         end
     end
 
@@ -102,7 +102,7 @@ module cpu (
         .pc(pc),
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk),
-        .upg_wen_i(upg_wen_o),
+        .upg_wen_i(upg_wen_o&!upg_adr_o[14]),
         .upg_adr_i(upg_adr_o),
         .upg_dat_i(upg_dat_o),
         .upg_done_i(upg_done_o)
@@ -162,7 +162,7 @@ wire [31:0]Check;
         .tmp_data(Reg_tmp),
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk),
-        .upg_wen_i(upg_wen_o),
+        .upg_wen_i(upg_wen_o&upg_adr_o[14]),
         .upg_adr_i(upg_adr_o),
         .upg_dat_i(upg_dat_o),
         .upg_done_i(upg_done_o)
@@ -203,7 +203,7 @@ wire [31:0]Check;
     vga u_vga (
         .clk(clk_in),
         .rst(rst_in),
-        .val(led2N4),
+        .val(pc[23:0]),
         .r  (r),
         .g  (g),
         .b  (b),
