@@ -36,12 +36,12 @@ module vga (
         if (rst) begin
             data0 <= 35'b0;  //reset, all zero
         end else begin
-            data0[35:30] = val[23:20];
-            data0[29:24] = val[19:16];
-            data0[23:18] = val[15:12];
-            data0[17:12] = val[11:8];
-            data0[11:6]  = val[7:4];
-            data0[5:0]   = val[3:0];
+            data0[35:30] <= val[23:20];
+            data0[29:24] <= val[19:16];
+            data0[23:18] <= val[15:12];
+            data0[17:12] <= val[11:8];
+            data0[11:6]  <= val[7:4];
+            data0[5:0]   <= val[3:0];
         end
     end
 

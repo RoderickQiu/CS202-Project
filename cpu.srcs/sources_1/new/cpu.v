@@ -39,22 +39,32 @@ module cpu (
     wire [31:0] data_switch;
     wire [2:0] led_control, switch_control;
     reg [25:0] divider_clk, divider_upg;
+    reg [23:0]dclk_mem; 
+    reg clk_mem;
 
     initial begin
         divider_clk = 0;
         divider_upg = 0;
         clk = 0;
         upg_clk = 0;
+        dclk_mem=0;
+        clk_mem=0;
     end
 
     always @(posedge clk_in) begin
         divider_clk <= divider_clk + 1;
-        if (divider_clk == 3) begin
+        if (divider_clk == 4) begin
             clk <= ~clk;
-            // divider_clk <= 0;
+            divider_clk <= 0;
         end
     end
-
+    always @(posedge clk_in) begin
+        dclk_mem <= dclk_mem + 1;
+        if (dclk_mem == 1) begin
+            clk_mem <= ~clk_mem;
+            dclk_mem<=0;
+        end
+    end
     always @(posedge clk_in) begin
         divider_upg <= divider_upg + 1;
         if (divider_upg == 9) begin
@@ -150,7 +160,7 @@ wire [31:0]Check;
 
     // MEM part: Data memory
     stage_mem MEM (
-        .clk(clk),
+        .clk(clk_mem),
         .rst(rst_in),
         .mem_read(Memread),
         .mem_write(Memwrite),

@@ -32,7 +32,7 @@ module stage_mem (
         .clka (kickOff ? trans_clk : upg_clk_i),
         .wea  (kickOff ? mem_write : upg_wen_i),
         .addra(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),
-        .dina (kickOff ? mem_write : upg_dat_i),
+        .dina (kickOff ? mem_write_data : upg_dat_i),
         .douta(tmp_data)
     );
 
