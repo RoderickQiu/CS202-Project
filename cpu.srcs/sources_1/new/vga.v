@@ -121,21 +121,21 @@ module vga (
 
 
     assign pclk = count[1];
-    always @(posedge clk or negedge rst) begin
-        if (!rst) count <= 0;
+    always @(posedge clk or posedge rst) begin
+        if (rst) count <= 0;
         else count <= count + 1;
     end
 
     // count horizontal and vertical length
     assign hs = (hcount < 96) ? 0 : 1;
-    always @(posedge pclk or negedge rst) begin
-        if (!rst) hcount <= 0;
+    always @(posedge pclk or posedge rst) begin
+        if (rst) hcount <= 0;
         else if (hcount == 799) hcount <= 0;
         else hcount <= hcount + 1;
     end
     assign vs = (vcount < 2) ? 0 : 1;
-    always @(posedge pclk or negedge rst) begin
-        if (!rst) vcount <= 0;
+    always @(posedge pclk or posedge rst) begin
+        if (rst) vcount <= 0;
         else if (hcount == 799) begin
             if (vcount == 520) vcount <= 0;
             else vcount <= vcount + 1;
@@ -143,8 +143,8 @@ module vga (
     end
 
     //analyze and get output, for 1 being lit up
-    always @(posedge pclk or negedge rst) begin
-        if (!rst) begin
+    always @(posedge pclk or posedge rst) begin
+        if (rst) begin
             r <= 0;
             g <= 0;
             b <= 0;

@@ -13,8 +13,8 @@ module vga_char_set (
     output reg [7:0] col6
 );
 
-    always @(posedge clk or negedge rst) begin
-        if (!rst) begin  // reset, all zero
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin  // reset, all zero
             col0 <= 8'b0000_0000;
             col1 <= 8'b0000_0000;
             col2 <= 8'b0000_0000;
