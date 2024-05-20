@@ -14,7 +14,7 @@ module stage_mem (
     input upg_rst_i,  // UPG reset (Active High)
     input upg_clk_i,  // UPG ram_clk_i (10MHz)
     input upg_wen_i,  // UPG write enable
-    input [13:0] upg_adr_i,  // UPG write address
+    input [14:0] upg_adr_i,  // UPG write address
     input [31:0] upg_dat_i,  // UPG write data
     input upg_done_i  // 1 if programming is finished
 );
@@ -27,11 +27,11 @@ module stage_mem (
 
     // wire [31:0] out_mem;
     // wire [15:0] out_oi;
-    //    wire write = mem_write | oi_write;
+//    wire write = mem_write | oi_write;
     dmem32 dmem (
         .clka (kickOff ? trans_clk : upg_clk_i),
         .wea  (kickOff ? mem_write : upg_wen_i),
-        .addra(kickOff ? mem_write_addr[15:2] : upg_adr_i),
+        .addra(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),
         .dina (kickOff ? mem_write : upg_dat_i),
         .douta(tmp_data)
     );
@@ -49,7 +49,7 @@ module stage_mem (
         // .clk(clk),
         .mem_read(mem_read),
         .mem_write(mem_write),
-        .alu_result_addr(kickOff ? mem_write_addr[15:2] : upg_adr_i),
+        .alu_result_addr(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),
         .led_control(led_control),
         .switch_control(switch_control)
         // .Result(tmp_data)
