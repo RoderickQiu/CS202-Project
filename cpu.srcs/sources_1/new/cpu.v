@@ -9,7 +9,6 @@ module cpu (
 
     // UART ports
     input  start_pg,
-    input  end_pg,
     input  rx,
     output tx,
 
@@ -74,24 +73,19 @@ module cpu (
         end
     end
 
-    wire spg_bufg, spg_bufg2;
+    wire spg_bufg;
     debouncer deb1 (
         .clk  (clk_in),
         .k_in (start_pg),
         .k_out(spg_bufg)
     );
-    debouncer deb2 (
-        .clk  (clk_in),
-        .k_in (end_pg),
-        .k_out(spg_bufg2)
-    );
 
     reg upg_rst;
     always @(posedge clk_in) begin
         if (spg_bufg) upg_rst = 0;
-        if (fpga_rst || spg_bufg2) upg_rst = 1;
+        if (fpga_rst) upg_rst = 1;
     end
-    assign rst_in = fpga_rst | !upg_rst;
+    assign rst_in = fpga_rst | (!upg_rst & !upg_done_o);
     uart_bmpg_0 uart (
         .upg_clk_i(upg_clk),
         .upg_rst_i(upg_rst),

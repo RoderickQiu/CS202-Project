@@ -14,10 +14,10 @@ module mem_or_io (
 );
 
     assign switch_control = a7==2'b10 ? 3'b100:
-    ((mem_read && alu_result_addr[13:2]==`SWITCH_MEM) ?
+    ((mem_read && alu_result_addr[13:3]==`SWITCH_MEM) ?
     alu_result_addr[2:0]:3'b000);
     assign led_control = a7==2'b11 ? 3'b100:
-    ((mem_write && alu_result_addr[13:2]==`LED_MEM) ?
+    ((mem_write && alu_result_addr[13:3]==`LED_MEM) ?
     alu_result_addr[2:0]:3'b000);
 
 endmodule
