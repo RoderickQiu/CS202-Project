@@ -21,10 +21,12 @@ module stage_id (
     output [31:0] Reg_out2,
     output [31:0] Imm,
     output [6:0] func7,
-    output [2:0] func3
-);
+    output [2:0] func3,
+    output [1:0]a7
+);//a0=10 a7=17
 
     wire [4:0] Reg_id1, Reg_id2, Reg_idwr;
+    wire [4:0] id1, id2, idwr;
     wire [6:0] opcode;
     wire zero;
 
@@ -40,10 +42,10 @@ module stage_id (
     );
 
     instruction_control IC (  // ID part: Instruction control
-
         .rst(rst),
         .func3(func3),
         .opcode(opcode),
+        .a7(a7[0]),
         .Branch(Branch),
         .Memread(Memread),
         .Memtoreg(Memtoreg),
@@ -52,14 +54,18 @@ module stage_id (
         .ALUSRC(ALUSRC),
         .RegWrite(RegWrite),
         .Signed(Signed),
-        .Jump(Jump)
+        .Jump(Jump),
+        .Ec(a7[1]),
+        .id1(id1),
+        .id2(id2),
+        .idwr(idwr)
     );
 
     register REG (  // ID part: Register file
         .Check(Check),
-        .id1(Reg_id1),
-        .id2(Reg_id2),
-        .idwr(Reg_idwr),
+        .id1(a7[1]?id1:Reg_id1),
+        .id2(a7[1]?id2:Reg_id2),
+        .idwr(a7[1]?idwr:Reg_idwr),
         .RegWrite(RegWrite),
         .clk(clk),
         .rst(rst),
@@ -69,6 +75,7 @@ module stage_id (
         .tmp_data(tmp_data),
         .sw_data(sw_data),
         .rd1(Reg_out1),
-        .rd2(Reg_out2)
+        .rd2(Reg_out2),
+        .a7(a7[0])
     );
 endmodule

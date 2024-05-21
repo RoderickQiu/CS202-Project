@@ -41,7 +41,7 @@ module cpu (
     reg [25:0] divider_clk, divider_upg;
     reg [23:0] dclk_mem;
     reg clk_mem;
-
+    wire [1:0]a7;
     initial begin
         divider_clk = 0;
         divider_upg = 0;
@@ -55,14 +55,14 @@ module cpu (
         divider_clk <= divider_clk + 1;
         if (divider_clk == 4) begin
             clk <= ~clk;
-            // divider_clk <= 0;
+            divider_clk <= 0;
         end
     end
     always @(posedge clk_in) begin
         dclk_mem <= dclk_mem + 1;
         if (dclk_mem == 1) begin
             clk_mem <= ~clk_mem;
-            // dclk_mem<=0;
+            dclk_mem<=0;
         end
     end
     always @(posedge clk_in) begin
@@ -141,7 +141,8 @@ module cpu (
         .Reg_out2(Reg_out2),
         .Imm(Imm),
         .func7(func7),
-        .func3(func3)
+        .func3(func3),
+        .a7(a7)
     );
 
     // EX part: ALU
@@ -169,6 +170,7 @@ module cpu (
         .led_control(led_control),
         .mem_write_addr(Result),
         .mem_write_data(Reg_out2),
+        .a7(a7),
         .tmp_data(Reg_tmp),
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk_o),

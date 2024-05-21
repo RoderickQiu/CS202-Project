@@ -8,6 +8,7 @@ module stage_mem (
     input [31:0] data_switch,
     input [31:0] mem_write_addr,  // orgininate from ALU
     input [31:0] mem_write_data,
+    input [1:0]a7,
     output [31:0] tmp_data,
     output [2:0] switch_control,
     output [2:0] led_control,
@@ -28,10 +29,12 @@ module stage_mem (
     // wire [31:0] out_mem;
     // wire [15:0] out_oi;
 //    wire write = mem_write | oi_write;
+    wire [13:0]_0;
+    assign _0=0;
     dmem32 dmem (
         .clka (kickOff ? trans_clk : upg_clk_i),
         .wea  (kickOff ? mem_write : upg_wen_i),
-        .addra(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),
+        .addra(a7[1]?_0:(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0])),
         .dina (kickOff ? mem_write_data : upg_dat_i),
         .douta(tmp_data)
     );
@@ -47,6 +50,7 @@ module stage_mem (
 
     mem_or_io dmemio (
         // .clk(clk),
+        .a7(a7),
         .mem_read(mem_read),
         .mem_write(mem_write),
         .alu_result_addr(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),

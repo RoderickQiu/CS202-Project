@@ -15,7 +15,8 @@ module register (
     input [31:0]tmp_data,
     input [31:0]sw_data,
     output  [31:0] rd1,
-    output  [31:0] rd2
+    output  [31:0] rd2,
+    output a7
 );
     reg [31:0] Reg[31:0];
     integer i;
@@ -37,11 +38,10 @@ module register (
         pre=idwr;
     end
 
-    // always @(posedge clk) begin
     assign    rd1 = Reg[id1];
     assign    rd2 = Reg[id2];
-    // end
-    assign    Check = {Reg[id2][31:4],id2[3:0]};    
+    assign    a7 = Reg[17][0];
+    assign    Check = Reg[17];    
     always @(posedge clk) begin
         if (rst) begin
             for (i = 0; i < 32; i = i + 1) begin
@@ -51,6 +51,5 @@ module register (
         end else if (RegWrite && idwr != 5'b00000) begin
             Reg[pre] <=w_data;
         end
-        // pre<=idwr;
     end
 endmodule
