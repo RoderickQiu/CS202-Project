@@ -1,3 +1,11 @@
+#Test2_0: input: 001:8bit right signed     output: 110:8bit_right
+#Test2_1:input:  110:16bit unsigned  output: 110:8bit_right
+#Test2_2:input:  110:16bit unsigned output: 110:8bit_right
+#Test2_3:input:  110:16bit unsigned  output: 110:8bit_right
+#Test2_4:input:  110:16bit unsigne output: 110:16bit unsigned 
+#Test2_5:input: 111:12bit unsigned output: 111:12bit_res
+#Test2_6:input:  16bit unsigned  output: 110:8bit_right
+#Test2_7:input:  16bit unsigned  output: 110:8bit_right
 .data
 	array: .space 5000
 .text
@@ -6,10 +14,11 @@
     addi t0, t0, -1024
     add t0, t0, t2
     lui t1, 0xfffff
-    addi t1, t1, -1008
+    addi t1, t1, -992
     add t1, t1, t2
+    addi s10, t0, 256
     
-    lw s9, 0(t0)
+    lw s9, 16(t0)
     srli s9, s9, 21 # the index of testcase
     beq s9, x0, T1
     addi s9, s9, -1
@@ -40,12 +49,12 @@ T1:
 		srli a1, a1, 1
 		j loop1
 	end1:
-		addi s1, t1, 4
+		addi s1, t1, 24
 		sw t3, 0(s1)
 	j end
 T2:
 	Calc2:
- 		addi t2, t0, 8
+ 		addi t2, t0, 24
 		lw t3, 0(t2) # read
 		lui a0, 0x8
 		lui a1, 0x8
@@ -75,12 +84,12 @@ T2:
 		addi a2, a2, 1
 	output_2:
 		add a0, x0, a2
-		addi s1, t1, 4
+		addi s1, t1, 24
 		sw a0, 0(s1)
 	j end
 T3:
 	Calc3:
- 		addi t2, t0, 8
+ 		addi t2, t0, 24
 		lw t3, 0(t2) # read
 		lui a0, 0x8
 		lui a1, 0x8
@@ -110,12 +119,12 @@ T3:
 		addi a2, a2, 1
 	output_3:
 		add a0, x0, a2
-		addi s1, t1, 4
+		addi s1, t1, 24
 		sw a0, 0(s1)
 	j end
 T4:
 	Calc4:
- 		addi t2, t0, 8
+ 		addi t2, t0, 24
 		lw t3, 0(t2) # read
 		lui a0, 0x8
 		lui a1, 0x8
@@ -149,14 +158,14 @@ T4:
 		addi a2, a2, 1
 	output_4:
 		add a0, x0, a2
-		addi s1, t1, 4
+		addi s1, t1, 24
 		sw a0, 0(s1)	
 	j end
 T5:
 	addi s0, t0, 0
 	addi s1, t1, 0
 	Calc5:
- 		addi s2, s0, 8
+ 		addi s2, s0, 24
 		lw t0, 0(s2) # read a and b
 		srli t1, t0, 8
 		andi t0, t0, 255
@@ -169,22 +178,22 @@ T5:
  	output_5:
  		xori t2, t2, 255
  		add a0, x0, t2
- 		addi s2, s1, 0
+ 		addi s2, s1, 24
 		sw a0, 0(s2)
 	j end
 T6:
 	addi s0, t0, 0
 	addi s1, t1, 0
-	addi s2, s0, 12
+	addi s2, s0, 28
 	lw t0, 0(s2) # read a and b
-	sw t0, 12(s1) # write a to Led
+	sw t0, 28(s1) # write a to Led
 	j end
 T7:
 	addi s0, t0, 0
 	addi s1, t1, 0
 	Calc7:
     	addi t3, x0, -1
-    	lw t4, 0(s0)
+    	lw t4, 24(s0)
     	addi t4, t4, 1
     	addi t5, zero, 0 #i
     	addi t6, zero, 0 #ans
@@ -198,7 +207,7 @@ T7:
     	add t6, t6, a4
     	bnez a2, loop_7
     addi a0, a6, 0
-    sw a0, 0(s1)
+    sw a0, 24(s1)
     j end
 solve_7:
     addi sp, sp, -12
@@ -229,10 +238,10 @@ T8:
 	addi s0, t0, 0
 	addi s1, t1, 0
 	Calc8:
-		la a6, array
+		addi a6, s10, 0
     	addi a0, x0, 0
     	addi t3, a0, -1
-    	lw t4, 0(s0)
+    	lw t4, 24(s0)
     	addi t4, t4, 1
     	addi t5, zero, 0 #i
     	addi t6, zero, 0 #ans
@@ -245,8 +254,6 @@ T8:
     	and a4, a2, a3
     	add t6, t6, a4
     	bnez a2, loop_8
-	output_8: # many data stored in array end point = a6 start point = la array
-		#TODO
     j end
     
 	solve_8:
@@ -275,4 +282,3 @@ T8:
     	addi sp, sp, 12
     	jr ra	
 end:
-	
