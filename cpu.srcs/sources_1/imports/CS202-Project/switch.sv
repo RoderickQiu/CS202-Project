@@ -16,7 +16,7 @@ module switch (
         end else if (switch_control==3'b101&&Signed==1'b0) begin
             sw_data={16'b00000000_00000000,switch_rdata[7:0]};
         end else if (switch_control==3'b101&&Signed==1'b1) begin
-            sw_data= $signed(switch_rdata[8:0]);
+            sw_data= $signed(switch_rdata[7:0]);
         end else if (switch_control==3'b110) begin
             sw_data={8'b00000000,switch_rdata[15:0]};
         end else if (switch_control==3'b111) begin
