@@ -24,14 +24,14 @@ module cpu (
     output [7:0] tub_sel
 );
 
-    wire [31:0] Reg_out1, Reg_out2,  Reg_tmp;
+    wire [31:0] Reg_out1, Reg_out2, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
-    wire Branch , Memread , Memtoreg , Memwrite , ALUSRC, RegWrite , Signed ;
-    wire oiread , oiwrite ;
+    wire Branch, Memread, Memtoreg, Memwrite, ALUSRC, RegWrite, Signed;
+    wire oiread, oiwrite;
     wire [3:0] ALUop;
     wire [6:0] func7;
     wire [2:0] func3;
-    wire zero , upg_clk_o , Jump ,rst_in;
+    wire zero, upg_clk_o, Jump, rst_in;
     reg clk, upg_clk;  // the using clock signals
     wire upg_wen_o, upg_done_o;  // uart write out enable, rx data have done
     wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
@@ -39,7 +39,7 @@ module cpu (
     wire [31:0] data_switch;
     wire [2:0] led_control, switch_control;
     reg [25:0] divider_clk, divider_upg;
-    reg [23:0]dclk_mem; 
+    reg [23:0] dclk_mem;
     reg clk_mem;
 
     initial begin
@@ -47,8 +47,8 @@ module cpu (
         divider_upg = 0;
         clk = 0;
         upg_clk = 0;
-        dclk_mem=0;
-        clk_mem=0;
+        dclk_mem = 0;
+        clk_mem = 0;
     end
 
     always @(posedge clk_in) begin
@@ -86,7 +86,7 @@ module cpu (
             upg_rst = 1;
         end
     end
-    assign rst_in =fpga_rst | !upg_rst;
+    assign rst_in = fpga_rst | !upg_rst;
     uart_bmpg_0 uart (
         .upg_clk_i(upg_clk),
         .upg_rst_i(upg_rst),
@@ -111,13 +111,13 @@ module cpu (
         .instruct(Instruction),
         .pc(pc),
         .upg_rst_i(upg_rst),
-        .upg_clk_i(upg_clk),
-        .upg_wen_i(upg_wen_o&!upg_adr_o[14]),
+        .upg_clk_i(upg_clk_o),
+        .upg_wen_i(upg_wen_o & !upg_adr_o[14]),
         .upg_adr_i(upg_adr_o),
         .upg_dat_i(upg_dat_o),
         .upg_done_i(upg_done_o)
     );
-wire [31:0]Check;
+    wire [31:0] Check;
     // ID part: Instruction decode
     stage_id ID (
         .Check(Check),
@@ -171,8 +171,8 @@ wire [31:0]Check;
         .mem_write_data(Reg_out2),
         .tmp_data(Reg_tmp),
         .upg_rst_i(upg_rst),
-        .upg_clk_i(upg_clk),
-        .upg_wen_i(upg_wen_o&upg_adr_o[14]),
+        .upg_clk_i(upg_clk_o),
+        .upg_wen_i(upg_wen_o & upg_adr_o[14]),
         .upg_adr_i(upg_adr_o),
         .upg_dat_i(upg_dat_o),
         .upg_done_i(upg_done_o)
