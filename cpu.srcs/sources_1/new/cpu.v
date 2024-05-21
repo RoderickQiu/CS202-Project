@@ -55,14 +55,14 @@ module cpu (
         divider_clk <= divider_clk + 1;
         if (divider_clk == 4) begin
             clk <= ~clk;
-            divider_clk <= 0;
+            // divider_clk <= 0;
         end
     end
     always @(posedge clk_in) begin
         dclk_mem <= dclk_mem + 1;
         if (dclk_mem == 1) begin
             clk_mem <= ~clk_mem;
-            dclk_mem<=0;
+            // dclk_mem<=0;
         end
     end
     always @(posedge clk_in) begin
@@ -194,7 +194,7 @@ wire [31:0]Check;
     led u_led (
         .clk(clk),
         .rst(rst_in),
-        .control({switch_control,led_control}),
+        .control(pc[7:2]),
         .led_control(led_control),
         .ledwdata(Reg_out2),
         .ledout_w(led2N4[23:16]),
@@ -224,7 +224,7 @@ wire [31:0]Check;
     seg u_seg (
         .clk(clk_in),
         .rst(rst_in),
-        .val(pc),
+        .val(Instruction),
         .seg_out(seg_out),
         .tub_sel(tub_sel)
     );

@@ -14,21 +14,21 @@ module IFetch (
 
     prgrom urom (
         .clka(clk ),
-        .addra(pc[13:0]),  // input wire [13:0] addr
+        .addra(pc[15:2]),  // input wire [13:0] addr
         .douta(inst)  // output wire [31:0] dout
     );
 
     wire [31:0] pc_plus_4;
     assign pc_plus_4 = pc + 4;
-
-
-    always @(negedge clk) begin
+    always @(*)begin
         if (branch && zero ) begin
-            next_pc <= pc + imm32;
+            next_pc = pc + imm32;
         end else begin
-            next_pc <= pc_plus_4;
+            next_pc = pc_plus_4;
         end
-        if (rst) begin
+    end
+    always @(negedge clk) begin
+        if (!rst) begin
             pc <= 0;
         end else begin
             pc <= next_pc;
