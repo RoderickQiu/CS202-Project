@@ -10,8 +10,8 @@
 #        110:8bit_right
 #        111:12bit_res.text
 #Test1_0: input: 16bit unsigned     output: 100:all
-#Test1_1:input: 110:16bit unsigned    output:110:8bit_right
-#Test1_2:input: 110:16bit unsigned    output: 110:8bit_right
+#Test1_1:input: 110:16bit unsigned    output:100:16bit_right
+#Test1_2:input: 110:16bit unsigned    output: 100:16bit_right
 #Test1_3:input: mid signed and right signed.   output: 110:8bit_right
 #Test1_4:input: mid signed and right signed.   output: 110:8bit_right
 #Test1_5:input: mid signed and right signed.   output: 110:8bit_right
@@ -55,14 +55,14 @@ T2:
 	addi t2, t0, 24
 	lb t3, 0(t2) # read a
 	# bind t3 to VGA or other displayer
-	addi s1, t1, 24
+	addi s1, t1, 16
 	sw t3, 0(s1)
 	j end
 T3:
 	addi t2, t0, 24
 	lbu t3, 0(t2) # read a
 	# bind t3 to VGA or other displayer
-	addi s1, t1, 24
+	addi s1, t1, 16
 	sw t3, 0(s1)
 	j end
 T4:
