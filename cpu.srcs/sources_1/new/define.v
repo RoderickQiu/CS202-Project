@@ -9,6 +9,7 @@
 `define ALU_CTRL_ADD_SIGNED 4'b1000
 `define ALU_CTRL_SUB_SIGNED 4'b1001
 `define ALU_CTRL_XOR 4'b1010
+`define ALU_CTRL_ECALL 4'b1011
 
 `define ALU_OP_LW 4'b0000
 `define ALU_OP_SW 4'b0000
@@ -54,6 +55,7 @@
 `define ALU_OP_J 4'b0101
 `define ALU_OP_I 4'b0111
 `define ALU_OP_AUIPC 4'b0100
+`define ALU_OP_ECALL 4'b1000
 
 `define R_TYPE 7'b0110011
 `define I_TYPE_1 7'b0010011

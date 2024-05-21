@@ -108,7 +108,19 @@ module instruction_control (
                     Jump = 1'b0;
                 end
                 `ECALL: begin
-                    //ToDo
+                    ALUSRC = 1'b0;
+                    Memtoreg = 1'b0;
+                    RegWrite = a7;
+                    Memread = 1'b0;
+                    Memwrite = 1'b0;
+                    Branch = 1'b0;
+                    Signed = 1'b0;
+                    ALUop = `ALU_CTRL_ECALL;
+                    Jump = 1'b0;
+                    if (a7 == 1'b0) begin
+                    end
+                    else begin
+                    end
                 end
             endcase
         end else begin
