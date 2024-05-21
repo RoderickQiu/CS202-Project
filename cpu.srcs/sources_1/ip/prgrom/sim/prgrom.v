@@ -92,7 +92,7 @@ output wire [31 : 0] douta;
     .C_LOAD_INIT_FILE(1),
     .C_INIT_FILE_NAME("prgrom.mif"),
     .C_INIT_FILE("prgrom.mem"),
-    .C_USE_DEFAULT_DATA(0),
+    .C_USE_DEFAULT_DATA(1),
     .C_DEFAULT_DATA("0"),
     .C_HAS_RSTA(0),
     .C_RST_PRIORITY_A("CE"),

@@ -103,7 +103,7 @@ T7:
 	lw t3, 0(t2) # read a and b
 	srli t4, t3, 8
 	andi t3, t3, 255
-	bltu t3, t4, led_4_1
+	bltu t4, t3, led_4_1
 	led_4_0:
 		sw s5, 24(t1) # LED = dark
 		j next_4
@@ -116,7 +116,7 @@ T8:
 	lw t3, 0(t2) # read a and b
 	srli t4, t3, 8
 	andi t3, t3, 255
-	bgeu t3, t4, led_5_1
+	bgeu t4, t3, led_5_1
 	led_5_0:
 		sw s5, 24(t1) # LED = dark
 		j next_5

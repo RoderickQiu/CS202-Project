@@ -55,14 +55,14 @@ module cpu (
         divider_clk <= divider_clk + 1;
         if (divider_clk == 4) begin
             clk <= ~clk;
-//            divider_clk <= 0;
+           divider_clk <= 0;
         end
     end
     always @(posedge clk_in) begin
         dclk_mem <= dclk_mem + 1;
         if (dclk_mem == 1) begin
             clk_mem <= ~clk_mem;
-//            dclk_mem<=0;
+           dclk_mem<=0;
         end
     end
     always @(posedge clk_in) begin

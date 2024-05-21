@@ -45,7 +45,7 @@ module stage_ex (
                 3'b000: zero= (alu_result==32'b0)?1'b1:1'b0;
                 3'b001: zero= (alu_result!=32'b0)?1'b1:1'b0;
                 3'b100: zero= ($signed(read_data1) < $signed(operand2))?1'b1:1'b0;
-                3'b101: zero= ($signed(read_data1) > $signed(operand2))?1'b1:1'b0;
+                3'b101: zero= ($signed(read_data1) >= $signed(operand2))?1'b1:1'b0;
                 3'b110: zero= (read_data1<operand2)?1'b1:1'b0;
                 3'b111: zero= (read_data1>=operand2)?1'b1:1'b0;
             endcase
