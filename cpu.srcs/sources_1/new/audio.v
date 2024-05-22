@@ -58,7 +58,7 @@ end
 
 // Audio buffer memory
 reg [31:0] read_ptr = 0, write_ptr = 0;
-reg [31:0] ram[0:16383];
+reg [31:0] ram[0:255];
 
 initial begin
     ram[0] = 0;
@@ -77,7 +77,7 @@ always @(cur_note) begin
 end
 
 // Read data from RAM on slow clock edge
-always @(posedge slow_clk or posedge rst) begin
+always @(posedge slow_clk) begin
     cur_note_play <= ram[read_ptr];
     read_ptr <= read_ptr + 1;
 end
