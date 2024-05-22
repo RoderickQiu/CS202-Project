@@ -21,7 +21,10 @@ module cpu (
 
     // 7-Seg ports    
     output [7:0] seg_out,
-    output [7:0] tub_sel
+    output [7:0] tub_sel,
+
+    // Audio ports
+    output buzzer
 );
 
     wire [31:0] Reg_out1, Reg_out2, Reg_tmp;
@@ -41,7 +44,7 @@ module cpu (
     reg [25:0] divider_clk, divider_upg;
     reg [23:0] dclk_mem;
     reg clk_mem;
-    wire [1:0]a7;
+    wire [1:0] a7;
     initial begin
         divider_clk = 0;
         divider_upg = 0;
@@ -55,14 +58,14 @@ module cpu (
         divider_clk <= divider_clk + 1;
         if (divider_clk == 4) begin
             clk <= ~clk;
-           divider_clk <= 0;
+            divider_clk <= 0;
         end
     end
     always @(posedge clk_in) begin
         dclk_mem <= dclk_mem + 1;
         if (dclk_mem == 1) begin
-            clk_mem <= ~clk_mem;
-           dclk_mem<=0;
+            clk_mem  <= ~clk_mem;
+            dclk_mem <= 0;
         end
     end
     always @(posedge clk_in) begin
@@ -167,6 +170,7 @@ module cpu (
         .data_switch(data_switch),
         .switch_control(switch_control),
         .led_control(led_control),
+        .audio_control(audio_control),
         .mem_write_addr(Result),
         .mem_write_data(Reg_out2),
         .a7(a7),
@@ -229,5 +233,18 @@ module cpu (
         .seg_out(seg_out),
         .tub_sel(tub_sel)
     );
+
+    audio u_audio (
+        .clk(clk_in),
+        .enable(audio_control),
+        .cur_note(Reg_out2),
+        .buzzer(buzzer)
+    );
+
+    // TODO for cur_note save
+    // we should save cur_note to audio_buf_mem
+    // or we just test it without buf_mem first
+    // because the current clock is slow
+    // maybe just use asm to give the note value
 
 endmodule

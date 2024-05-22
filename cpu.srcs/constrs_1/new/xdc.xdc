@@ -56,6 +56,8 @@ set_property PACKAGE_PIN Y19 [get_ports rx]
 set_property PACKAGE_PIN V18 [get_ports tx]
 set_property PACKAGE_PIN P5 [get_ports start_pg]
 
+set_property PACKAGE_PIN A19 [get_ports buzzer]
+
 set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN H15} [get_ports {r[3]}]
 set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN J15} [get_ports {r[2]}]
 set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN G18} [get_ports {r[1]}]
