@@ -8,10 +8,11 @@ module stage_mem (
     input [31:0] data_switch,
     input [31:0] mem_write_addr,  // orgininate from ALU
     input [31:0] mem_write_data,
-    input [1:0]a7,
+    input [1:0] a7,
     output [31:0] tmp_data,
     output [2:0] switch_control,
     output [2:0] led_control,
+    output audio_control,
     input upg_rst_i,  // UPG reset (Active High)
     input upg_clk_i,  // UPG ram_clk_i (10MHz)
     input upg_wen_i,  // UPG write enable
@@ -28,25 +29,16 @@ module stage_mem (
 
     // wire [31:0] out_mem;
     // wire [15:0] out_oi;
-//    wire write = mem_write | oi_write;
-    wire [13:0]_0;
-    assign _0=0;
+    //    wire write = mem_write | oi_write;
+    wire [13:0] _0;
+    assign _0 = 0;
     dmem32 dmem (
         .clka (kickOff ? trans_clk : upg_clk_i),
         .wea  (kickOff ? mem_write : upg_wen_i),
-        .addra(a7[1]?_0:(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0])),
+        .addra(a7[1] ? _0 : (kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0])),
         .dina (kickOff ? mem_write_data : upg_dat_i),
         .douta(tmp_data)
     );
-
-    // oi24 IO (
-    //     .clka (trans_clk),
-    //     .read (mem_read),
-    //     .wea  (mem_write),
-    //     .addra(mem_write_addr[15:2]),
-    //     .dina (mem_write_data),
-    //     .douta(tmp_out_oi)
-    // );
 
     mem_or_io dmemio (
         // .clk(clk),
@@ -55,7 +47,8 @@ module stage_mem (
         .mem_write(mem_write),
         .alu_result_addr(kickOff ? mem_write_addr[15:2] : upg_adr_i[13:0]),
         .led_control(led_control),
-        .switch_control(switch_control)
+        .switch_control(switch_control),
+        .audio_control(audio_control)
         // .Result(tmp_data)
     );
 endmodule
