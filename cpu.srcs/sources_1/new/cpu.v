@@ -35,21 +35,24 @@ module cpu (
     wire [6:0] func7;
     wire [2:0] func3;
     wire zero, upg_clk_o, Jump, rst_in;
-    reg clk, upg_clk;  // the using clock signals
+    reg clk, upg_clk, audio_clk;  // the using clock signals
     wire upg_wen_o, upg_done_o;  // uart write out enable, rx data have done
     wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
     wire [31:0] upg_dat_o;  // data to prgrom / dmem32
     wire [31:0] data_switch;
     wire [2:0] led_control, switch_control;
-    reg [25:0] divider_clk, divider_upg;
+    wire audio_control;
+    reg [25:0] divider_clk, divider_upg, divider_audio;
     reg [23:0] dclk_mem;
     reg clk_mem;
     wire [1:0] a7;
     initial begin
         divider_clk = 0;
         divider_upg = 0;
+        divider_audio = 0;
         clk = 0;
         upg_clk = 0;
+        audio_clk = 0;
         dclk_mem = 0;
         clk_mem = 0;
     end
@@ -73,6 +76,13 @@ module cpu (
         if (divider_upg == 9) begin
             upg_clk <= ~upg_clk;
             divider_upg <= 0;
+        end
+    end
+    always @(posedge clk_in) begin
+        divider_audio <= divider_audio + 1;
+        if (divider_audio == 99) begin
+            audio_clk <= ~audio_clk;
+            divider_audio <= 0;
         end
     end
 
@@ -204,7 +214,7 @@ module cpu (
         .rst(rst_in),
         .control(pc[7:2]),
         .led_control(led_control),
-        .ledwdata(Reg_out2),
+        .ledwdata(Reg_out2[23:0]),
         .ledout_w(led2N4[23:16]),
         .ledout(led2N4[15:0])
     );
@@ -239,6 +249,8 @@ module cpu (
 
     audio u_audio (
         .clk(clk_in),
+        .slow_clk(audio_clk),
+        .rst(rst_in),
         .enable(audio_control),
         .cur_note(Reg_out2),
         .buzzer(buzzer)

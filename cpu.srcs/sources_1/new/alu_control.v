@@ -35,7 +35,7 @@ module alu_control (
             end
             `ALU_OP_LUI: alu_ctrl = `ALU_CTRL_LUI;
             `ALU_OP_AUIPC: alu_ctrl = `ALU_CTRL_AUIPC;
-            `ALU_OP_JR: alu_ctrl = `ALU_CTRL_JR
+            `ALU_OP_JR: alu_ctrl = `ALU_CTRL_JR;
         endcase
     end
 
