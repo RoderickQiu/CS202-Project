@@ -50,7 +50,7 @@ T1:
 		j loop1
 	end1:
 		addi s1, t1, 24
-		sw t3, 0(s1)
+		sw a0, 0(s1)
 	j end
 T2:
 	Calc2:
