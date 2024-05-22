@@ -89,7 +89,7 @@
 
 | J-Type | opcode   | rs1      | rs2     | rd      | fun7   | fun3     | 使用方式                             | 举例              |
 | ------ | -------- | ------- | ------- | ------- | ------- | -------- | ------------------------------------ | ----------------- |
-| jal    | `1101111` | NULL | NULL | rd | NULL | NULL | **rd = PC + 4; PC += imm** | `jal t0, label` |
+| jal    | `1101111` | NULL | imm | rd | NULL | NULL | **rd = PC + 4; PC += imm** | `jal t0, label` |
 | jalr   | `1100111` | rs1 | imm | rd | NULL | NULL | **rd = PC + 4; PC = rs1 + imm** | `jalr t0, 0(t1)` |
 
 | Bonus | opcode   | rs1      | rs2     | rd      | fun7   | fun3     | 使用方式                             | 举例              |
@@ -98,25 +98,26 @@
 | auipc | `0010111` | NULL | NULL | rd | NULL | NULL | **rd = PC + imm << 12** | `auipc t0, 0x80000` |
 | ecall | `1110011`| NULL | NULL | NULL | `0000000`| `000` |**r7 = 0 在LED上输出a0** **r7 = 1 读入Switch上读入值储存到a0**| `ecall` |
 
-- 参考的 ISA：**MiniSys-1A，MIPS**
+- 参考的 ISA：**MiniSys-1A，RISCV**
 
 - 寻址空间设计：使用了哈佛结构。指令中寻址单位为字节，实际中以字为数据位宽，即指令空间和数据空间读写位宽均为 **32 bits**，读写深度均为 **16384**
 
-- 外设 IO 支持：软硬件协同以实现功能，采用 MMIO 外设。对应的寻址范围为 0xFFFFFFC00 起，地址末 4bit 值分别为：
+- 外设 IO 支持：软硬件协同以实现功能，采用 MMIO 外设。Switch LED对应的寻址范围的前四位都为0xFFFF, 后四位分别为1111_1100_000x_xx00和1111_1100_001x_xx00, 下列表格展示了不同xxx组合的不同功能。
 
-  | IO 设备             | 地址末 4bit |
+  | IO设备         | xxx 3bit |
   | ------------------- | ----------- |
-  | 开关输入 低 8 位    | 0x0         |
-  | 开关输入 中 8 位    | 0x1         |
-  | 开关输入 高 8  位   | 0x2         |
-  | 确认按钮输入        | 0x3         |
-  | 键盘输入            | 0x9         |
-  | LED 灯输出 低 8 位  | 0x0         |
-  | LED 灯输出 中 8 位  | 0x1         |
-  | LED 灯输出 高 8 位  | 0x2         |
-  | LED 灯输出 低 16 位 | 0x3         |
-  | 七段数码显示输出    | 0x8         |
-  | VGA 输出            | 0x7         |
+  | Switch 输入 24位`unsigned`   | `100`|
+  | Switch 输入 中间8位`signed`   |  `101`     |
+  | Switch 输入 右边8位`signed`  | `001`        |
+  | Switch 输入 右边16位`unsigned`   | `110`|
+  | Switch 输入 右边12位`unsigned`   | `111`|
+  | LED 输出 右边16位 | `100`       |
+  | LED 输出 中间8位 | `101`         |
+  | LED 输出 右边8位 | `110`        |
+  | LED 输出 右边12位 | `111`        |
+  | 七段数码显示输出    |        |
+  | VGA 输出            |      |
+    | Reset按钮      |      |
 
 - CPU 为单周期 CPU，CPI 接近为 1，不支持 Pipeline
 
