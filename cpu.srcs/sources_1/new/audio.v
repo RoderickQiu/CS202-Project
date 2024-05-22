@@ -33,7 +33,6 @@ parameter silence = 30'h3fff_ffff;
 
 reg[29:0] cur_half_period = note_period;
 reg[31:0] cur_note_play;
-reg first_enable = 0;
 
 integer cur_half_period_count = 0;      // inverse buzzer if cur_half_period_count > note_period
 integer index_count = 0;      // add index by 1 if index_count > index_period
@@ -43,11 +42,7 @@ always @(posedge clk) begin
         index_count = 0;
         cur_half_period_count = 0;
         buzzer = 0;
-        first_enable = 0;
     end else begin
-        if(enable && !first_enable) begin
-            first_enable = 1;
-        end
         if(cur_half_period_count >= cur_half_period) begin
             cur_half_period_count = 0;
             buzzer = ~buzzer;
@@ -65,6 +60,13 @@ end
 reg [31:0] read_ptr = 0, write_ptr = 0;
 reg [31:0] ram[0:16383];
 
+initial begin
+    ram[0] = 0;
+    read_ptr = 0;
+    cur_note_play = 0;
+    write_ptr = 0;
+end
+
 // Write data to RAM when input changes
 // Write without waiting for a clock edge
 always @(cur_note) begin
@@ -76,15 +78,8 @@ end
 
 // Read data from RAM on slow clock edge
 always @(posedge slow_clk or posedge rst) begin
-    if (rst || !first_enable) begin
-        read_ptr  <= 0;
-        cur_note_play <= 0;
-        write_ptr <= 0;
-        ram[0]    <= 0;
-    end else begin
-        cur_note_play <= ram[read_ptr];
-        read_ptr <= read_ptr + 1;
-    end
+    cur_note_play <= ram[read_ptr];
+    read_ptr <= read_ptr + 1;
 end
 
 always @(*) begin
