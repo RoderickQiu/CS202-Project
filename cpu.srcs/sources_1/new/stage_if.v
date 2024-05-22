@@ -7,6 +7,8 @@ module stage_if (
     input branch,
     input zero,
     input Jump,
+    input [31:0]rs1,
+    input JR,
     input [31:0] imm,
     output [31:0] instruct,
     output reg [31:0] pc,  // 4-based, so addr = pc[15:2]
@@ -42,7 +44,10 @@ module stage_if (
     //     end
     // end
     always @(*) begin
-        if ((branch && zero) || Jump) begin
+        if (JR) begin
+            next_pc = rs1 + imm;
+        end 
+        else if ((branch && zero) || Jump) begin
             next_pc = pc + imm;
         end else begin
             next_pc = pc_plus_4;

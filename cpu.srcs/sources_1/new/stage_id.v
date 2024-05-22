@@ -22,7 +22,8 @@ module stage_id (
     output [31:0] Imm,
     output [6:0] func7,
     output [2:0] func3,
-    output [1:0]a7
+    output [1:0]a7,
+    output JR
 );//a0=10 a7=17
 
     wire [4:0] Reg_id1, Reg_id2, Reg_idwr;
@@ -58,7 +59,8 @@ module stage_id (
         .Ec(a7[1]),
         .id1(id1),
         .id2(id2),
-        .idwr(idwr)
+        .idwr(idwr),
+        .JR(JR)
     );
 
     register REG (  // ID part: Register file

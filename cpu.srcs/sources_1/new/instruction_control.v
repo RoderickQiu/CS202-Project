@@ -18,7 +18,8 @@ module instruction_control (
     output reg Ec,
     output reg [4:0]id1,
     output reg [4:0]id2,
-    output reg [4:0]idwr
+    output reg [4:0]idwr,
+    output reg JR
 );
     
     always @(*) begin
@@ -38,6 +39,7 @@ module instruction_control (
                     id1=0;
                     id2=0;
                     idwr=0;
+                    JR=0;
                 end
                 `I_TYPE_1: begin
                     ALUSRC   = 1'b1;
@@ -53,6 +55,7 @@ module instruction_control (
                     id1=0;
                     id2=0;
                     idwr=0;
+                    JR=0;
                 end
                 `I_TYPE_2: begin
                     ALUSRC = 1'b1;
@@ -68,6 +71,7 @@ module instruction_control (
                     id1=0;
                     id2=0;
                     idwr=0;
+                    JR=0;
                 end
                 `S_TYPE: begin
                     ALUSRC = 1'b1;
@@ -83,6 +87,7 @@ module instruction_control (
                     id1=0;
                     id2=0;
                     idwr=0;
+                    JR=0;
                 end
                 `B_TYPE: begin
                     ALUSRC = 1'b0;
@@ -98,6 +103,7 @@ module instruction_control (
                     id1=0;
                     id2=0;
                     idwr=0;
+                    JR=0;
                 end
                 `J_TYPE: begin
                     ALUSRC = 1'b1;
@@ -113,6 +119,23 @@ module instruction_control (
                     id1=0;
                     id2=0;
                     idwr=0;
+                    JR=0;
+                end
+                `JR_TYPE: begin
+                    ALUSRC = 1'b1;
+                    Memtoreg = 1'b0;
+                    RegWrite = 1'b1;
+                    Memread = 1'b0;
+                    Memwrite = 1'b0;
+                    Branch = 1'b0;
+                    Signed = 1'b0;
+                    ALUop = `ALU_OP_JR;
+                    Jump = 1'b1;
+                    Ec=1'b0;
+                    id1=0;
+                    id2=0;
+                    idwr=0;
+                    JR=1;
                 end
                 `U_TYPE_LUI: begin
                     ALUSRC = 1'b1;
@@ -128,6 +151,7 @@ module instruction_control (
                     id1=0;
                     id2=0;
                     idwr=0;
+                    JR=0;
                 end
                 `U_TYPE_AUIPC: begin
                     ALUSRC = 1'b1;
@@ -143,6 +167,7 @@ module instruction_control (
                     id1=0;
                     id2=0;
                     idwr=0;
+                    JR=0;
                 end
                 `ECALL: begin//0:switch   1:led
                     ALUSRC = 1'b0;
@@ -151,7 +176,7 @@ module instruction_control (
                     ALUop = `ALU_CTRL_ECALL;
                     Jump = 1'b0;
                     Ec=1'b1;
-                    
+                    JR=0;
                     if (a7 == 1'b0) begin//switch
                         RegWrite = 1'b1;
                         Memread = 1'b1;
@@ -183,6 +208,7 @@ module instruction_control (
             Signed = 1'b0;
             Jump = 1'b0;
             Ec=1'b0;
+            JR=0;
         end
     end
 

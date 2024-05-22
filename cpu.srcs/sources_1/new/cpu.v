@@ -29,7 +29,7 @@ module cpu (
 
     wire [31:0] Reg_out1, Reg_out2, Reg_tmp;
     wire [31:0] Result, Instruction, Imm, pc, next_pc, pc_plus_4;
-    wire Branch, Memread, Memtoreg, Memwrite, ALUSRC, RegWrite, Signed;
+    wire Branch, Memread, Memtoreg, Memwrite, ALUSRC, RegWrite, Signed, JR;
     wire oiread, oiwrite;
     wire [3:0] ALUop;
     wire [6:0] func7;
@@ -112,6 +112,8 @@ module cpu (
         .imm(Imm),
         .instruct(Instruction),
         .pc(pc),
+        .rs1(Reg_out1),
+        .JR(JR),
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk_o),
         .upg_wen_i(upg_wen_o & !upg_adr_o[14]),
@@ -144,7 +146,8 @@ module cpu (
         .Imm(Imm),
         .func7(func7),
         .func3(func3),
-        .a7(a7)
+        .a7(a7),
+        .JR(JR)
     );
 
     // EX part: ALU

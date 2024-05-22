@@ -6,8 +6,6 @@
 #Test2_5:input: 111:12bit unsigned output: 111:12bit_res
 #Test2_6:input:  16bit unsigned  output: 110:8bit_right
 #Test2_7:input:  16bit unsigned  output: 110:8bit_right
-.data
-	array: .space 5000
 .text
 	lui t2, 0x1
     lui t0, 0xfffff
@@ -192,93 +190,87 @@ T7:
 	addi s0, t0, 0
 	addi s1, t1, 0
 	Calc7:
-    	addi t3, x0, -1
-    	lw t4, 24(s0)
-    	addi t4, t4, 1
-    	addi t5, zero, 0 #i
-    	addi t6, zero, 0 #ans
-    loop_7:
-    	addi t5, t5, 1
-    	addi a0, t5, 0
-    	jal solve_7
-    	slt a2, a0, t4
-    	sgt a3, a0, t2
-    	and a4, a2, a3
-    	add t6, t6, a4
-    	bnez a2, loop_7
-    addi a0, a6, 0
-    sw a0, 24(s1)
-    j end
-solve_7:
-    addi sp, sp, -12
-    addi a6, a6, 3
-    sw ra, 4(sp)
-    sw a0, 0(sp)
-    slti t0, a0, 2
-    beq t0, zero, L1_7 # >=2 further process
-    addi a0, zero, 1
-    addi sp, sp, 12
-    addi a6, a6, 3
-    jr ra
-L1_7:
-    addi a0, a0, -1 # f(n-1)
-    jal solve_7 # call
-    sw a0, 8(sp) # store f(n-1)
-    lw a0, 0(sp)  #get n from memory
-    addi a0, a0, -2 #f(n-2)
-    jal solve_7 #call
-    lw t1, 8(sp) #get f(n-1) from memory
-    add a0, a0, t1 #f(n)=f(n-1)+f(n-2)
-    lw ra, 4(sp) #load ra from memory
-    addi sp, sp, 12
-    addi a6, a6, 3
-    jr ra
+		lw t4, 24(s0)
+		addi t5, zero, 0 #i
+		addi t6, zero, 0 #ans
+		addi s9, x0, 0
+		loop7:
+			addi t5, t5, 1
+			addi a0, t5, 0
+			jal solve7
+			slt a2, a0, t4
+			sgt a3, a0, t2
+			and a4, a2, a3
+			add t6, t6, a4
+			bnez a2, loop7
+		sw t6, 20(s1)
+		sw s9, 24(s1)
+		j end
+	solve7:
+		addi sp, sp, -12
+		addi s9, s9, 3
+		sw ra, 4(sp)
+		sw a0, 0(sp)
+		slti t0, a0, 2
+		beq t0, zero, L17 # >=2 further process
+		addi a0, zero, 1
+		addi sp, sp, 12
+		addi s9, s9, 3
+		jr ra
+	L17:
+		addi a0, a0, -1 # f(n-1)
+		jal solve7 # call
+		sw a0, 8(sp) # store f(n-1)
+		lw a0, 0(sp)  #get n from memory
+		addi a0, a0, -2 #f(n-2)
+		jal solve7 #call
+		lw t1, 8(sp) #get f(n-1) from memory
+		add a0, a0, t1 #f(n)=f(n-1)+f(n-2)
+		lw ra, 4(sp) #load ra from memory
+		addi sp, sp, 12
+		addi s9, s9, 3
+		jr ra
     
 T8:
 	addi s0, t0, 0
 	addi s1, t1, 0
 	Calc8:
-		addi a6, s10, 0
-    	addi a0, x0, 0
-    	addi t3, a0, -1
-    	lw t4, 24(s0)
-    	addi t4, t4, 1
-    	addi t5, zero, 0 #i
-    	addi t6, zero, 0 #ans
-    loop_8:
-    	addi t5, t5, 1
-    	addi a0, t5, 0
-    	jal solve_8
-    	slt a2, a0, t4
-    	sgt a3, a0, t2
-    	and a4, a2, a3
-    	add t6, t6, a4
-    	bnez a2, loop_8
-    j end
-    
-	solve_8:
-    	addi sp, sp, -12
-    	sw ra, 4(sp)
-    	sw a0, 0(a6)
-    	addi a6, a6, 4
-    	sw a0, 0(sp)
-    	slti t0, a0, 2
-    	beq t0, zero, L1_8 # >=2 further process
-    	addi a0, zero, 1
-    	addi sp, sp, 12
-    	jr ra
-	L1_8:
-    	addi a0, a0, -1 # f(n-1)
-    	jal solve_8 # call
-    	sw a0, 8(sp) # store f(n-1)
-    	sw a0, 0(a6)
-    	addi a6, a6, 4
-    	lw a0, 0(sp)  #get n from memory
-    	addi a0, a0, -2 #f(n-2)
-    	jal solve_8 #call
-    	lw t1, 8(sp) #get f(n-1) from memory
-    	add a0, a0, t1 #f(n)=f(n-1)+f(n-2)
-    	lw ra, 4(sp) #load ra from memory
-    	addi sp, sp, 12
-    	jr ra	
+		lw t4, 24(s0)
+		addi t5, zero, 0 #i
+		addi t6, zero, 0 #ans
+		addi s9, x0, 0
+		loop8:
+			addi t5, t5, 1
+			addi a0, t5, 0
+			jal solve8
+			slt a2, a0, t4
+			sgt a3, a0, t2
+			and a4, a2, a3
+			add t6, t6, a4
+			bnez a2, loop8
+		j end
+	solve8:
+		addi sp, sp, -12
+		addi s9, s9, 3
+		sw ra, 4(sp)
+		sw a0, 0(sp)
+		sw a0, 0(s10)
+		addi s10, s10, 4
+		slti t0, a0, 2
+		beq t0, zero, L18 # >=2 further process
+		addi a0, zero, 1
+		addi sp, sp, 12
+		jr ra
+	L18:
+		addi a0, a0, -1 # f(n-1)
+		jal solve8 # call
+		sw a0, 8(sp) # store f(n-1)
+		lw a0, 0(sp)  #get n from memory
+		addi a0, a0, -2 #f(n-2)
+		jal solve8 #call
+		lw t1, 8(sp) #get f(n-1) from memory
+		add a0, a0, t1 #f(n)=f(n-1)+f(n-2)
+		lw ra, 4(sp) #load ra from memory
+		addi sp, sp, 12
+		jr ra
 end:

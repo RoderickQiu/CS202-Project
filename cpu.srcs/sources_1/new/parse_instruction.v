@@ -68,6 +68,12 @@ module parse_instruction (
                     instruction[30:21], 1'b0
                 };
             end
+            `JR_TYPE: begin // J-type
+                rd = instruction[11:7];
+                func3 = instruction[14:12];
+                rs1 = instruction[19:15];
+                imm = {{20{instruction[31]}}, instruction[31:20]};
+            end
             `U_TYPE_LUI: begin  // U-type lui
                 rd = instruction[11:7];
                 imm = {
