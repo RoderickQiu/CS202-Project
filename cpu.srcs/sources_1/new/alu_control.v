@@ -11,7 +11,7 @@ module alu_control (
     always @(*) begin
         case (aluop)
             `ALU_OP_LW: alu_ctrl = `ALU_CTRL_ADD;
-            `ALU_OP_J: alu_ctrl = `ALU_CTRL_AUIPC;
+            `ALU_OP_J: alu_ctrl = `ALU_CTRL_JR;
             `ALU_OP_R: begin
                 if (func7 == 7'b0000000 && func3 == 3'b000) alu_ctrl = `ALU_CTRL_ADD;
                 else if (func7 == 7'b0100000 && func3 == 3'b000) alu_ctrl = `ALU_CTRL_SUB;
@@ -20,6 +20,7 @@ module alu_control (
                 else if (func7 == 7'b0000000 && func3 == 3'b001) alu_ctrl = `ALU_CTRL_SLL;
                 else if (func7 == 7'b0000000 && func3 == 3'b101) alu_ctrl = `ALU_CTRL_SRL;
                 else if (func7 == 7'b0000000 && func3 == 3'b100) alu_ctrl = `ALU_CTRL_XOR;
+                else if (func7 == 7'b0000000 && func3 == 3'b010) alu_ctrl = `ALU_CTRL_SL;
             end
             `ALU_OP_I: begin
                 if (func3 == 3'b000) alu_ctrl = `ALU_CTRL_ADD;
@@ -28,6 +29,7 @@ module alu_control (
                 else if (func3 == 3'b111) alu_ctrl = `ALU_CTRL_AND;
                 else if (func3 == 3'b001) alu_ctrl = `ALU_CTRL_SLL;
                 else if (func3 == 3'b101) alu_ctrl = `ALU_CTRL_SRL;
+                else if (func3 == 3'b010) alu_ctrl = `ALU_CTRL_SL;
             end
             `ALU_OP_B: begin
                 if (func3 == 3'b110 || func3 == 3'b111) alu_ctrl = `ALU_CTRL_SUB;

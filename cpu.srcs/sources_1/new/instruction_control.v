@@ -108,7 +108,7 @@ module instruction_control (
                 `J_TYPE: begin
                     ALUSRC = 1'b1;
                     Memtoreg = 1'b0;
-                    RegWrite = 1'b0;
+                    RegWrite = 1'b1;
                     Memread = 1'b0;
                     Memwrite = 1'b0;
                     Branch = 1'b0;
@@ -130,7 +130,7 @@ module instruction_control (
                     Branch = 1'b0;
                     Signed = 1'b0;
                     ALUop = `ALU_OP_JR;
-                    Jump = 1'b1;
+                    Jump = 1'b0;
                     Ec=1'b0;
                     id1=0;
                     id2=0;

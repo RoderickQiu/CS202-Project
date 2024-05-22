@@ -41,11 +41,11 @@ module register (
     assign    rd1 = Reg[id1];
     assign    rd2 = Reg[id2];
     assign    a7 = Reg[17][0];
-    assign    Check = Reg[17];    
-    always @(posedge clk) begin
+    assign    Check = Reg[1];    
+    always @(negedge clk) begin
         if (rst) begin
             for (i = 0; i < 32; i = i + 1) begin
-                if (i == 1) Reg[i] <= `SP_REG_INITIAL;
+                if (i == 2) Reg[i] <= `SP_REG_INITIAL;
                 else Reg[i] <= 0;
             end
         end else if (RegWrite && idwr != 5'b00000) begin

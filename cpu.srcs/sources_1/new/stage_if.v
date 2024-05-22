@@ -25,10 +25,10 @@ module stage_if (
     wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
 
     prgrom urom (
-        .clka(kickOff ? trans_clk : upg_clk_i),
-        .wea(kickOff ? 1'b0 : upg_wen_i),  // write enable
-        .addra(kickOff ? pc[15:2] : upg_adr_i[13:0]),  // input wire [13:0] addr
-        .dina(kickOff ? 32'h0000_0000 : upg_dat_i),  // input wire [31:0] din
+        .clka(trans_clk),
+        .wea(1'b0),  // write enable
+        .addra(pc[15:2]),  // input wire [13:0] addr
+        .dina(32'h0000_0000),  // input wire [31:0] din
         .douta(instruct)  // output wire [31:0] dout
     );
 

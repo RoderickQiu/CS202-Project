@@ -7,10 +7,6 @@ module cpu (
     input       [23:0] switch2N4,
     output wire [23:0] led2N4,
 
-    // UART ports
-    input  start_pg,
-    input  rx,
-    output tx,
 
     // VGA ports
     output [3:0] r,
@@ -34,24 +30,22 @@ module cpu (
     wire [3:0] ALUop;
     wire [6:0] func7;
     wire [2:0] func3;
-    wire zero, upg_clk_o, Jump, rst_in;
-    reg clk, upg_clk, audio_clk;  // the using clock signals
-    wire upg_wen_o, upg_done_o;  // uart write out enable, rx data have done
-    wire [14:0] upg_adr_o;  // data to which mem unit of prgrom / dmem32
-    wire [31:0] upg_dat_o;  // data to prgrom / dmem32
+    wire zero,  Jump, rst_in;
+    reg clk, audio_clk;  // the using clock signals
     wire [31:0] data_switch;
     wire [2:0] led_control, switch_control;
     wire audio_control;
-    reg [25:0] divider_clk, divider_upg, divider_audio;
+    reg [25:0] divider_clk, divider_audio;
     reg [23:0] dclk_mem;
     reg clk_mem;
     wire [1:0] a7;
+    reg [13:0]st=14'b1111_1101_0000_00;
+    reg [2:0]cnt_0=0;
+    wire [16:0]led2N4ing;
     initial begin
         divider_clk = 0;
-        divider_upg = 0;
         divider_audio = 0;
         clk = 0;
-        upg_clk = 0;
         audio_clk = 0;
         dclk_mem = 0;
         clk_mem = 0;
@@ -64,18 +58,12 @@ module cpu (
             divider_clk <= 0;
         end
     end
+
     always @(posedge clk_in) begin
         dclk_mem <= dclk_mem + 1;
         if (dclk_mem == 1) begin
             clk_mem  <= ~clk_mem;
             dclk_mem <= 0;
-        end
-    end
-    always @(posedge clk_in) begin
-        divider_upg <= divider_upg + 1;
-        if (divider_upg == 9) begin
-            upg_clk <= ~upg_clk;
-            divider_upg <= 0;
         end
     end
     always @(posedge clk_in) begin
@@ -86,32 +74,8 @@ module cpu (
         end
     end
 
-    wire spg_bufg;
-    debouncer deb1 (
-        .clk  (clk_in),
-        .k_in (start_pg),
-        .k_out(spg_bufg)
-    );
-
-    reg upg_rst;
-    always @(posedge clk_in) begin
-        if (spg_bufg) upg_rst = 0;
-        if (fpga_rst) upg_rst = 1;
-    end
-    assign rst_in = fpga_rst | (!upg_rst & !upg_done_o);
-    uart_bmpg_0 uart (
-        .upg_clk_i(upg_clk),
-        .upg_rst_i(upg_rst),
-        .upg_rx_i (rx),
-
-        .upg_clk_o (upg_clk_o),
-        .upg_wen_o (upg_wen_o),
-        .upg_adr_o (upg_adr_o),
-        .upg_dat_o (upg_dat_o),
-        .upg_done_o(upg_done_o),
-        .upg_tx_o  (tx)
-    );
-
+    assign rst_in = fpga_rst;
+    
     // IF part: Instruction fetch
     stage_if IF (
         .clk(clk),
@@ -123,13 +87,7 @@ module cpu (
         .instruct(Instruction),
         .pc(pc),
         .rs1(Reg_out1),
-        .JR(JR),
-        .upg_rst_i(upg_rst),
-        .upg_clk_i(upg_clk_o),
-        .upg_wen_i(upg_wen_o & !upg_adr_o[14]),
-        .upg_adr_i(upg_adr_o),
-        .upg_dat_i(upg_dat_o),
-        .upg_done_i(upg_done_o)
+        .JR(JR)
     );
     wire [31:0] Check;
     // ID part: Instruction decode
@@ -187,27 +145,9 @@ module cpu (
         .mem_write_addr(Result),
         .mem_write_data(Reg_out2),
         .a7(a7),
-        .tmp_data(Reg_tmp),
-        .upg_rst_i(upg_rst),
-        .upg_clk_i(upg_clk_o),
-        .upg_wen_i(upg_wen_o & upg_adr_o[14]),
-        .upg_adr_i(upg_adr_o),
-        .upg_dat_i(upg_dat_o),
-        .upg_done_i(upg_done_o)
+        .tmp_data(Reg_tmp)
     );
 
-    // WB part: Write back
-    // stage_wb WB (
-    //     .mem_to_reg(Memtoreg),
-    //     .read_data(Reg_con),
-    //     .oiread(oiread),
-    //     .oiwrite(oiwrite),
-    //     .switch_control(switch_control),
-    //     .led_control(led_control),
-    //     .sw_data(data_switch),
-    //     .mem_write_addr(Result),
-    //     .tmp_data(Reg_tmp)
-    // );
 
     led u_led (
         .clk(clk),
@@ -216,7 +156,7 @@ module cpu (
         .led_control(led_control),
         .ledwdata(Reg_out2[23:0]),
         .ledout_w(led2N4[23:16]),
-        .ledout(led2N4[15:0])
+        .ledout(led2N4ing)
     );
 
     switch u_sw (
@@ -242,20 +182,21 @@ module cpu (
     seg u_seg (
         .clk(clk_in),
         .rst(rst_in),
-        .val(Instruction),
+        .val({16'b0000_0000_0000_0000,led2N4[15:0]}),
         .seg_out(seg_out),
         .tub_sel(tub_sel)
     );
 
-    audio u_audio (
-        .clk(clk_in),
-        .slow_clk(audio_clk),
-        .rst(rst_in),
-        .enable(audio_control),
-        .cur_note(Reg_out2),
-        .buzzer(buzzer)
-    );
+    // audio u_audio (
+    //     .clk(clk_in),
+    //     .slow_clk(audio_clk),
+    //     .rst(rst_in),
+    //     .enable(audio_control),
+    //     .cur_note(Reg_out2),
+    //     .buzzer(buzzer)
+    // );
 
+    print u_print(.clk(clk_in),.in_init(led2N4ing),.new(Reg_tmp),.out(led2N4[15:0]),.Stop(Stop));
     // TODO for cur_note save
     // we should save cur_note to audio_buf_mem
     // or we just test it without buf_mem first

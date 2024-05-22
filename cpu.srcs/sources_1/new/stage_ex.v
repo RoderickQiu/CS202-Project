@@ -40,6 +40,8 @@ module stage_ex (
             `ALU_CTRL_XOR: alu_result = read_data1 ^ operand2;
             `ALU_CTRL_AUIPC: alu_result = pc + operand2;
             `ALU_CTRL_JR: alu_result = pc + 4;
+            `ALU_CTRL_SL: alu_result = read_data1 < operand2 ? 1 : 0;
+
         endcase
         if(aluop==`ALU_OP_B)begin
             case (func3)
