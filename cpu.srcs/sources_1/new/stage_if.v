@@ -19,14 +19,13 @@ module stage_if (
     input [14:0] upg_adr_i,  // UPG write address
     input [31:0] upg_dat_i,  // UPG write data
     input upg_done_i,  // 1 if program finish
-    output Stop
+    output reg Stop
 );
     reg [2:0]cnt=0;
     wire trans_clk;
     assign trans_clk = clk;
     reg [31:0] next_pc;
-    wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
-
+    
     prgrom urom (
         .clka(trans_clk),
         .wea(1'b0),  // write enable

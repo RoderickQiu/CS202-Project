@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-
+`include "define.v"
 module stage_mem (
     input clk,
     input rst,
@@ -26,12 +26,12 @@ module stage_mem (
     // wire [15:0] out_oi;
     //    wire write = mem_write | oi_write;
     wire [13:0] _0;
-    reg [13:0]mem_p=OUT_START;
+    reg [13:0]mem_p = `OUT_START-1;
     always @(negedge clk_p ) begin
         if(Stop)begin
-            mem_p=mem_p+4;
+            mem_p=mem_p+1;
         end else begin
-            mem_p=OUT_START-4;
+            mem_p=`OUT_START -1;
         end
     end
     assign _0 = 0;

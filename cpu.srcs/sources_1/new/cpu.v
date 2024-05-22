@@ -190,19 +190,24 @@ module cpu (
         .tub_sel(tub_sel)
     );
 
-    audio u_audio (
+    // audio u_audio (
+    //     .clk(clk_in),
+    //     .slow_clk(audio_clk),
+    //     .rst(rst_in),
+    //     .enable(audio_control),
+    //     .cur_note(Reg_out2),
+    //     .buzzer(buzzer)
+    // );
+    RenaiCirculation u_audio(
         .clk(clk_in),
-        .slow_clk(audio_clk),
-        .rst(rst_in),
-        .enable(audio_control),
-        .cur_note(Reg_out2),
-        .buzzer(buzzer)
+        .enable(audio_control), 
+        .music(buzzer)
     );
-
     print u_print(.Stop(Stop),
             .clk(clk_p),
             .in_init(led2N4[15:0]),
             .new(Reg_tmp),
-            .out(p_out));
+            .out(p_out)
+    );
 
 endmodule
