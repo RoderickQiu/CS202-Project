@@ -5,8 +5,10 @@ module audio (
     input slow_clk,
     input rst,
     input enable, 
+    input stop,
     input [31:0] cur_note,
-    output reg[0:0] buzzer = 0
+    output reg[0:0] buzzer = 0,
+    reg[31:0] cur_note_play
  );
 
 parameter do_low = 382225;
@@ -32,29 +34,21 @@ parameter index_period = note_period + rest;
 parameter silence = 30'h3fff_ffff;
 
 reg[29:0] cur_half_period = note_period;
-reg[31:0] cur_note_play;
 
 integer cur_half_period_count = 0;      // inverse buzzer if cur_half_period_count > note_period
-integer index_count = 0;      // add index by 1 if index_count > index_period
 
 always @(posedge clk) begin
     if(rst) begin
-        index_count = 0;
-        cur_half_period_count = 0;
-        buzzer = 0;
+        cur_half_period_count <= 0;
+        buzzer <= 0;
     end else begin
         if(cur_half_period_count >= cur_half_period) begin
-            cur_half_period_count = 0;
-            buzzer = ~buzzer;
+            cur_half_period_count <= 0;
+            buzzer <= ~buzzer;
          end
-        else cur_half_period_count = cur_half_period_count + 1;
-        if(index_count > index_period) begin
-            index_count = 0;
-        end
+        else cur_half_period_count <= cur_half_period_count + 1;
     end
-    index_count = index_count + 1;
 end
-
 
 // Audio buffer memory
 reg [31:0] read_ptr = 0, write_ptr = 0;
@@ -78,8 +72,10 @@ end
 
 // Read data from RAM on slow clock edge
 always @(posedge slow_clk) begin
-    cur_note_play <= ram[read_ptr];
-    read_ptr <= read_ptr + 1;
+    if(stop) begin
+        cur_note_play <= ram[read_ptr];
+        read_ptr <= read_ptr + 1;
+    end
 end
 
 always @(*) begin

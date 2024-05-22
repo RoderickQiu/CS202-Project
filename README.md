@@ -842,168 +842,110 @@ tb111_div1_2:
 
 ### Bonus 对应功能点的设计说明
 
-#### 1.设计思路及与周边模块的关系（配图仅供参考，端口以表格为准）
+#### 1. 实现对复杂外设接口的支持
 
-本次 Project 我们完成的 Bonus 有：支持小键盘读入（小键盘可以清空，删除），七段数码管，VGA 模式显示，UArs2 通信编程，具体的 Bonus 演示可参考我们的视频。
+##### 七段数码管：
 
-- UArs2
-
-  此模块安置于 `IFetch` 和 `Memory` 模块，通过使用串口通信，初始化两个模块内存的值，并返回编程完成的信号
-
-| 端口名称    | 功用描述          |
-| ----------- | ----------------- |
-| `upg_clk_i` | UArs2 时钟，10MHz  |
-| `upg_rs1t_i` | UArs2 复位信号     |
-| `upg_rx_i`  | UArs2 接收数据端口 |
-| `upg_tx_o`  | UArs2 发出数据端口 |
-
-![CPU_](img/CPU_.png)
-
-
-- [keyboard_ctrl](../CPU_Verilog/device/keyboard_ctrl.sv)
-
-​	   keyboard控制模块，当键盘被激活时，根据控制信号 `key_board_c` 的状态，将输入的键盘数据 `key_board_in` 传递给 `key_board_wdata` 输出端口，以供其他模块（例如 `Memio`）使用。
-
-| 端口名称          | 功用描述                           |
-| ----------------- | ---------------------------------- |
-| `clk`             | 时钟信号输入                       |
-| `rs1t`             | 复位信号输入                       |
-| `key_board_c`     | 来自键盘输入的控制信号             |
-| `key_board_in`    | 来自键盘输入的数据，16 位          |
-| `key_board_wdata` | 传递给 `memorio` 模块的数据，16 位 |
-
-![keyctrl](img/keyctrl.png)
-
-- [keyboard](../CPU_Verilog/device/key_board.sv)
-
-​	   根据扫描得到的键盘值返回CPU顶层，再由`keyboard_ctrl`模块决定是否采用键盘值参与运算。
-
-| 端口名称      | 功用描述          |
-| ------------- | ----------------- |
-| `clk`         | 时钟信号输入      |
-| `rs1t`         | 复位信号输入      |
-| `bend`        | 键盘输入清空信号  |
-| `row`         | 行输入，4 位      |
-| `col`         | 列输出，4 位      |
-| `keyboardval` | 键盘值输出，16 位 |
-
-![keyboard](img/keyboard.png)
-
-- [7seg](../CPU_Verilog/device/seg_ces.sv)
-
-  根据输入的 64bit 数据，每 8bit 为板子上一位数码管的显示信号。随着时钟快速刷新，同时改变 `seg_out` 的值，从而显示板子上的八位数字。
+该模块的功能是控制数码管的显示，通过分频器将输入的时钟信号分频，以控制数码管刷新的频率。使用计数器进行选择，依次显示输入数据的不同部分。通过输出的 `tub_sel` 信号选择当前显示的数码管，通过 `seg_out` 输出对应数码管上的数据。利用视觉暂留，使得八位都可以显示数字。
 
 | 端口名称  | 功用描述         |
 | --------- | ---------------- |
 | `clk`     | 时钟信号输入     |
-| `rs1t`     | 复位信号输入     |
-| `seg_in`  | 输入的 64 位数值 |
-| `seg_en`  | 7 位使能信号输出 |
+| `rst`     | 复位信号输入     |
+| `val`  | 输入的 32 位显示数值 |
+| `tub_sel`  | 8 位使能信号输出 |
 | `seg_out` | 8 位段码输出     |
 
-![7seg](img/7seg.png)
-
-- [VGA main](../CPU_Verilog/vga/vga.sv)
-
-  VGA 模块有一个控制模块，接受来自顶层的数据输入信号和模式选择内容信号，控制模块再输出字阵选择信号给字阵模块，字阵模块输出对应的显示输出信号给 VGA 主模块，扫描输出信号并决定 RGB 和水平、垂直同步信号给 CPU 顶层输出。
-
-| 端口名称  | 功用描述                                |
-| --------- | --------------------------------------- |
-| `clk`     | VGA 模块时钟，使用 FPGA 时钟            |
-| `rs1t`     | VGA 模块复位信号                        |
-| `vc_data` | VGA 的数据选择信号，由 VGA 控制单元给入 |
-| `rgb`     | VGA 12 位 RGB 颜色信号                  |
-| `hs`      | 水平同步信号                            |
-| `vs`      | 垂直同步信号                            |
-
-![vga](img/vga.png)
-
-#### 2.核心代码及必要说明
-
-**UArs2：**
-
-使用 IP 核，和课件实现完全一致
+其中核心代码如下：
 
 ```verilog
-    assign rs1t_in = fpga_rs1t | !upg_rs1t;
-```
-
-最终其他模块以此作为复位信号，即 UArs2 模块工作时，其他模块也休息
-
-##### 小键盘：
-
-概况总结：
-
-- 模块接收时钟信号`clk`和复位信号 `rs1t`，以及输入行（`row`）和输出列（`col`）。
-- 输出包括键盘值（`keyboardval`），表示当前按下的键，以及按键按下的标志（`key_pressed_flag`）。
-- 内部包含计数器（`cnt` 和 `cnts`）和状态寄存器（ `current_state` 和 `next_state` ）。
-
-基本思路：
-
-- 模块通过计数器生成 `key_clk` 和 `seg_clk` 信号，用于控制键盘扫描和键值更新的时钟。
-- 状态机通过检测输入的行号（`row`）和当前状态（`current_state`）来决定下一个状态（`next_state`）。
-- 根据当前状态，设置输出列（`col`）和按键按下的标志（`key_pressed_flag`）。
-- 当按键按下时，根据当前的列和行值，更新键盘值（`keyboardval`）。
-
-该模块使用了状态机的方式进行键盘扫描和键值更新。它通过不断递增的计数器生成时钟信号，控制扫描和更新的时间。在不同的状态下，根据输入行和当前状态，设置输出列和按键按下的标志，并在按键按下时更新键盘值。此模块可用于实现基本的键盘输入功能，检测按键并输出相应的键值和状态信息。
-
-##### 七段数码管：
-
-该模块的功能是控制数码管的显示，通过分频器将输入的时钟信号分频，以控制数码管刷新的频率。使用计数器进行选择，依次显示输入数据的不同部分。通过输出的 `seg_en` 信号选择当前显示的数码管，通过 `seg_out` 输出对应数码管上的数据。
-
-```verilog
-reg [14:0] cnts;                        
-wire clk_slow;
-//分频
-always @ (posedge clk or posedge rs1t)
-    if (rs1t)
-        cnts <= 0;
-	else
-    	cnts <= cnts + 1'b1;
-          
-assign clk_slow = cnts[14];
-```
-
-```verilog
-//根据分频后的时钟，不断刷新数码管
-//利用视觉暂留，实现八个位都可以显示数字
-always @ (posedge clk_slow or posedge rs1t) 
-    if(rs1t == 1)
-        seg_out <= 0;
-	else begin
-        case (cnt)
-            3'b111: seg_out = seg_in[7:0];
-            3'b000: seg_out = seg_in[15:8];
-            3'b001: seg_out = seg_in[23:16];
-            3'b010: seg_out = seg_in[31:24];
-            3'b011: seg_out = seg_in[39:32];
-            3'b100: seg_out = seg_in[47:40];
-            3'b101: seg_out = seg_in[55:48];
-            3'b110: seg_out = seg_in[63:56];
-        endcase
-    end
+always @(*) begin
+    case (divider_clk)
+        3'b000: begin
+            tub_sel = ~8'b00000001;
+            seg_in = p0;
+        end
+        3'b001: begin
+            tub_sel = ~8'b00000010;
+            seg_in = p1;
+        end
+        3'b010: begin
+            tub_sel = ~8'b00000100;
+            seg_in = p2;
+        end
+        3'b011: begin
+            tub_sel = ~8'b00001000;
+            seg_in = p3;
+        end
+        3'b100: begin
+            tub_sel = ~8'b00010000;
+            seg_in = p4;
+        end
+        3'b101: begin
+            tub_sel = ~8'b00100000;
+            seg_in = p5;
+        end
+        3'b110: begin
+            tub_sel = ~8'b01000000;
+            seg_in = p6;
+        end
+        3'b111: begin
+            tub_sel = ~8'b10000000;
+            seg_in = p7;
+        end
+        default: tub_sel = ~8'b00000000;
+    endcase
+end
 ```
 
 ##### VGA：
 
-同本学年上学期数字逻辑的实现思路类似，VGA 模块在 IO 激活时接收模式指示信号，并在内部转化为字阵的选择信号给字阵储存模块，接收储存模块的输出，存在 VGA 模块中，并在 VGA 信号扫描到对应亮起的像素点时输出 RGB 全 1 信号（白色）。
+该模块的功能是控制 VGA 的显示。读入输入的信息，转化为阵列字体的信号，存在一个个字符格（`vga_char_set`）中，并进行二维扫描，在 VGA 信号扫描到对应亮起的像素点时输出 RGB 全 1 信号（白色）。
+
+| 端口名称  | 功用描述                                |
+| --------- | --------------------------------------- |
+| `clk`     | VGA 模块时钟，使用 FPGA 时钟            |
+| `rst`     | VGA 模块复位信号                        |
+| `val` | VGA 的数据输入信号 |
+| `r`, `g`, `b`     | VGA 的 RGB 颜色信号，各 4 位                |
+| `hs`      | 水平同步信号                            |
+| `vs`      | 垂直同步信号                            |
 
 ```verilog
-always @(posedge pclk or posedge rs1t) begin
-    if (rs1t) begin
-        rgb <= 12'b0;
-    end else if (vcount >= UP_BOUND && vcount <= DOWN_BOUND && hcount >= LEFT_BOUND && hcount <= RIGHT_BOUND) begin
-        if (vcount >= up_pos && vcount <= down_pos && hcount >= left_pos && hcount <= right_pos) begin
-            if (p[hcount-left_pos][vcount-up_pos]) begin
-                rgb <= 12'b1111_1111_1111; //扫描激活，输出12bit全1
+//analyze and get output, for 1 being lit up
+always @(posedge pclk or posedge rst) begin
+    if (rst) begin
+        r <= 0;
+        g <= 0;
+        b <= 0;
+    end
+    else if (vcount>=UP_BOUND && vcount<=DOWN_BOUND
+             && hcount>=LEFT_BOUND && hcount<=RIGHT_BOUND) begin
+        if (hcount >= left_pos && hcount <= right_pos) begin
+            if (vcount >= up_pos_0 && vcount <= down_pos_0) begin
+                if (p0[hcount-left_pos][vcount-up_pos_0]) begin
+                    r <= 4'b1111;
+                    g <= 4'b1111;
+                    b <= 4'b1111;
+                end else begin
+                    r <= 4'b0000;
+                    g <= 4'b0000;
+                    b <= 4'b0000;
+                end
             end else begin
-                rgb <= 12'b0;
+                r <= 4'b0000;
+                g <= 4'b0000;
+                b <= 4'b0000;
             end
         end else begin
-            rgb <= 12'b0;
+            r <= 4'b0000;
+            g <= 4'b0000;
+            b <= 4'b0000;
         end
     end else begin
-        rgb <= 12'b0;
+        r <= 4'b0000;
+        g <= 4'b0000;
+        b <= 4'b0000;
     end
 end
 ```
@@ -1011,72 +953,19 @@ end
 下面是控制模块的核心代码：
 
 ```verilog
-wire [3:0] mode = data_in[3:0];
-always @(posedge clk, posedge rs1t) begin
-    if (rs1t) begin
-        data <= {_SPACE, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE};
-    end else if (!vga_ctrl) begin
-        data <= data;
+//control data from val
+always @(posedge clk, posedge rst) begin
+    if (rst) begin
+        data0 <= 35'b0;  //reset, all zero
     end else begin
-        case (mode)
-            4'b0000: begin
-                data <= {_vP, _vO, _vW, _SPACE, _SPACE, _SPACE};
-            end
-            4'b0001: begin
-                data <= {_vO, _vD, _vD, _SPACE, _SPACE, _SPACE};
-            end
-            4'b0010: begin
-                data <= {_vO, _vR, _SPACE, _SPACE, _SPACE, _SPACE};
-            end
-            4'b0011: begin
-                data <= {_vN, _vO, _vR, _SPACE, _SPACE, _SPACE};
-            end
-            4'b0100: begin
-                data <= {_vX, _vO, _vR, _SPACE, _SPACE, _SPACE};
-            end
-            4'b0101: begin
-                data <= {_vL, _vE, _vS, _vS, _SPACE, _SPACE};
-            end
-            4'b0110: begin
-                data <= {_vL, _vE, _vS, _vS, _SPACE, _vU};
-            end
-            4'b0111: begin
-                data <= {_vI, _vN, _vP, _vU, _vT, _SPACE};
-            end
-            4'b1000: begin
-                data <= {_vS, _vU, _vM, _SPACE, _SPACE, _SPACE};
-            end
-            4'b1001: begin
-                data <= {_vS, _vT, _vA, _vC, _vK, _SPACE};
-            end
-            4'b1010: begin
-                data <= {_vP, _vU, _vS, _vH, _SPACE, _SPACE};
-            end
-            4'b1011: begin
-                data <= {_vP, _vO, _vP, _SPACE, _SPACE, _SPACE};
-            end
-            4'b1100: begin
-                data <= {_vA, _vD, _vD, _SPACE, _SPACE, _SPACE};
-            end
-            4'b1101: begin
-                data <= {_vS, _vU, _vB, _SPACE, _SPACE, _SPACE};
-            end
-            4'b1110: begin
-                data <= {_vM, _vU, _vT, _vI, _SPACE, _SPACE};
-            end
-            4'b1111: begin
-                data <= {_vD, _vI, _vV, _SPACE, _SPACE, _SPACE};
-            end
-
-            // default: begin
-            //     data <= {_vW, _vA, _vI, _vT, _SPACE, _SPACE};
-            // end
-        endcase
+        data0[35:30] <= val[23:20];
+        data0[29:24] <= val[19:16];
+        data0[23:18] <= val[15:12];
+        data0[17:12] <= val[11:8];
+        data0[11:6]  <= val[7:4];
+        data0[5:0]   <= val[3:0];
     end
 end
-```
-
-其中各个字对应的字阵数据宏已在 VGA 头文件 [vhead.svh](../CPU_Verilog/vga/vhead.svh) 中规定
 
 ### Bonus 测试说明
 

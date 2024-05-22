@@ -30,17 +30,20 @@ module cpu (
     wire [3:0] ALUop;
     wire [6:0] func7;
     wire [2:0] func3;
-    wire zero,  Jump, rst_in;
+    wire zero, Jump, rst_in;
     reg clk, audio_clk;  // the using clock signals
     wire [31:0] data_switch;
     wire [2:0] led_control, switch_control;
     wire audio_control;
-    reg [25:0] divider_clk, divider_audio;
+    reg [25:0] divider_clk;
     reg [23:0] dclk_mem;
-    reg clk_mem;
+    reg [24:0] divider_audio;
+    reg [26:0] divider_clk_p;
+    reg clk_mem, clk_p;
     wire [1:0] a7;
-    wire [31:0]p_out;
+    wire [31:0] p_out;
     wire Stop;
+
     initial begin
         divider_clk = 0;
         divider_audio = 0;
@@ -49,7 +52,12 @@ module cpu (
         dclk_mem = 0;
         clk_mem = 0;
     end
-
+    always @(posedge clk_in) begin
+        divider_clk_p <= divider_clk_p + 1;
+        if (divider_clk_p == 4) begin
+            clk_p <= ~clk_p;
+        end
+    end
     always @(posedge clk_in) begin
         divider_clk <= divider_clk + 1;
         if (divider_clk == 4) begin
@@ -67,14 +75,14 @@ module cpu (
     end
     always @(posedge clk_in) begin
         divider_audio <= divider_audio + 1;
-        if (divider_audio == 99) begin
+        if (divider_audio == 64) begin
             audio_clk <= ~audio_clk;
-            divider_audio <= 0;
+            //sdivider_audio <= 0;
         end
     end
 
     assign rst_in = fpga_rst;
-    
+
     // IF part: Instruction fetch
     stage_if IF (
         .clk(clk),
@@ -159,7 +167,7 @@ module cpu (
         .led_control(led_control),
         .ledwdata(Reg_out2[23:0]),
         .ledout_w(led2N4[23:16]),
-        .ledout(led2N4ing)
+        .ledout(led2N4[15:0])
     );
 
     switch u_sw (
@@ -182,32 +190,33 @@ module cpu (
         .vs (vs)
     );
 
+    wire [31:0] audio_out;
+
     seg u_seg (
         .clk(clk_in),
         .rst(rst_in),
-        .val({16'b0000_0000_0000_0000,led2N4[15:0]}),
+        .val(audio_out),
         .seg_out(seg_out),
         .tub_sel(tub_sel)
     );
 
-    // audio u_audio (
-    //     .clk(clk_in),
-    //     .slow_clk(audio_clk),
-    //     .rst(rst_in),
-    //     .enable(audio_control),
-    //     .cur_note(Reg_out2),
-    //     .buzzer(buzzer)
-    // );
-    RenaiCirculation u_audio(
+    audio u_audio (
         .clk(clk_in),
-        .enable(audio_control), 
-        .music(buzzer)
+        .slow_clk(audio_clk),
+        .rst(rst_in),
+        .enable(audio_control),
+        .cur_note(Reg_out2),
+        .buzzer(buzzer),
+        .cur_note_play(audio_out),
+        .stop(Stop)
     );
-    print u_print(.Stop(Stop),
-            .clk(clk_p),
-            .in_init(led2N4[15:0]),
-            .new(Reg_tmp),
-            .out(p_out)
+
+    print u_print (
+        .Stop(Stop),
+        .clk(clk_p),
+        .in_init(led2N4[15:0]),
+        .new(Reg_tmp),
+        .out(p_out)
     );
 
 endmodule
