@@ -39,9 +39,8 @@ module cpu (
     reg [23:0] dclk_mem;
     reg clk_mem;
     wire [1:0] a7;
-    reg [13:0]st=14'b1111_1101_0000_00;
-    reg [2:0]cnt_0=0;
-    wire [16:0]led2N4ing;
+    wire [31:0]p_out;
+    wire Stop;
     initial begin
         divider_clk = 0;
         divider_audio = 0;
@@ -80,6 +79,7 @@ module cpu (
     stage_if IF (
         .clk(clk),
         .rst(rst_in),
+        .clk_p(clk_p),
         .branch(Branch),
         .zero(zero),
         .Jump(Jump),
@@ -87,7 +87,8 @@ module cpu (
         .instruct(Instruction),
         .pc(pc),
         .rs1(Reg_out1),
-        .JR(JR)
+        .JR(JR),
+        .Stop(Stop)
     );
     wire [31:0] Check;
     // ID part: Instruction decode
@@ -136,6 +137,8 @@ module cpu (
     stage_mem MEM (
         .clk(clk_mem),
         .rst(rst_in),
+        .clk_p(clk_p),
+        .Stop(Stop),
         .mem_read(Memread),
         .mem_write(Memwrite),
         .data_switch(data_switch),
@@ -196,6 +199,10 @@ module cpu (
         .buzzer(buzzer)
     );
 
-    // print u_print(.clk(clk_in),.in_init(led2N4ing),.new(Reg_tmp),.out(led2N4[15:0]),.Stop(Stop));
+    print u_print(.Stop(Stop),
+            .clk(clk_p),
+            .in_init(led2N4[15:0]),
+            .new(Reg_tmp),
+            .out(p_out));
 
 endmodule

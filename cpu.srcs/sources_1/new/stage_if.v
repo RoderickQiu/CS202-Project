@@ -4,6 +4,7 @@
 module stage_if (
     input clk,
     input rst,
+    input clk_p,
     input branch,
     input zero,
     input Jump,
@@ -17,8 +18,10 @@ module stage_if (
     input upg_wen_i,  // UPG write enable
     input [14:0] upg_adr_i,  // UPG write address
     input [31:0] upg_dat_i,  // UPG write data
-    input upg_done_i  // 1 if program finish
+    input upg_done_i,  // 1 if program finish
+    output Stop
 );
+    reg [2:0]cnt=0;
     wire trans_clk;
     assign trans_clk = clk;
     reg [31:0] next_pc;
@@ -56,8 +59,24 @@ module stage_if (
     always @(negedge clk) begin
         if (rst) begin
             pc <= -4;
+            cnt<= 0;
+            Stop<=0; 
         end else begin
-            pc <= next_pc;
+            if(instruct==0)begin
+                cnt<= (cnt==3'b111) ? cnt : (cnt+1);
+            end else begin
+                cnt<=0;
+            end
+            if(cnt==3'b111)begin
+                Stop<=1'b1;
+            end else begin
+                Stop<=1'b0;
+            end
+            if(Stop==0)begin
+                pc <= next_pc;
+            end else begin
+                pc <= pc;
+            end
         end
     end
 
