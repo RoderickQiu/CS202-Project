@@ -237,7 +237,7 @@ module cpu (
     audio u_audio (
         .clk(clk_in),
         .enable(audio_control),
-        .cur_note(Reg_out2[3:0]),
+        .cur_note(Reg_out2),
         .buzzer(buzzer)
     );
 

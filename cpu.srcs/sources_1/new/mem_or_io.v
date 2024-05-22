@@ -10,7 +10,8 @@ module mem_or_io (
 
     input  [13:0] alu_result_addr,
     output [ 2:0] led_control,
-    output [ 2:0] switch_control
+    output [ 2:0] switch_control,
+    output audio_control
 );
 
     assign switch_control = a7==2'b10 ? 3'b100:

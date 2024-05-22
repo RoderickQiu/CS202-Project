@@ -3,7 +3,7 @@
 module audio (
     input clk,
     input enable, 
-    input [3:0] cur_note,
+    input [31:0] cur_note,
     output reg[0:0] buzzer = 0
  );
 
@@ -58,21 +58,21 @@ always @ * begin
         cur_half_period = silence;
     else
         case(cur_note)
-            4'd0 : cur_half_period = silence;
-            4'd1 : cur_half_period = do_low;
-            4'd2 : cur_half_period = re_low;
-            4'd3 : cur_half_period = me_low;
-            4'd4 : cur_half_period = fa_low;
-            4'd5 : cur_half_period = so_low;
-            4'd6 : cur_half_period = la_low;
-            4'd7 : cur_half_period = si_low;
-            4'd8 : cur_half_period = do;
-            4'd9 : cur_half_period = re;
-            4'd10 : cur_half_period = me;
-            4'd11: cur_half_period = fa;
-            4'd12 : cur_half_period = so;
-            4'd13 : cur_half_period = la;
-            4'd14 : cur_half_period = si;
+            32'h30303030 : cur_half_period = silence; // 0000
+            32'h30303031 : cur_half_period = do_low; // 0001
+            32'h30303130 : cur_half_period = re_low; // 0010
+            32'h30303131 : cur_half_period = me_low; // 0011
+            32'h30313030 : cur_half_period = fa_low; // 0100
+            32'h30313031 : cur_half_period = so_low; // 0101
+            32'h30313130 : cur_half_period = la_low; // 0110
+            32'h30313131 : cur_half_period = si_low; // 0111
+            32'h31303030 : cur_half_period = do; // 1000
+            32'h31303031 : cur_half_period = re; // 1001
+            32'h31303130 : cur_half_period = me; // 1010
+            32'h31303131 : cur_half_period = fa; // 1011
+            32'h31313030 : cur_half_period = so; // 1100
+            32'h31313031 : cur_half_period = la; // 1101
+            32'h31313130 : cur_half_period = si; // 1110
             default : cur_half_period = silence;
         endcase
 end
