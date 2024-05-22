@@ -63,6 +63,8 @@
 | srai    | `0010011` | rs1      | imm | rd      | `imm[11:5]=0x20` | `101` | rd <- **rs1 >> imm\[4:0] (算术右移)**   | `srai t0, t1, 8`   |
 | slti    | `0010011` | rs1      | imm | rd      | Null | `010` | rd <- **(rs1 < imm) ? 1 : 0**     | `slti t0, t1, 9`   |
 
+
+
 | I-Type2 | opcode   | rs1      | rs2     | rd      | fun7   | fun3     | 使用方式                             | 举例              |
 | ------ | -------- | ------- | ------- | ------- | ------- | -------- | ------------------------------------ | ----------------- |
 | lb | `0000011` | rs1      | imm | rd      | Null | `000` | rd = **{24’bM\[rs1+imm][7],M\[rs1+imm][7:0]}** | `lb t0, 0(t1)`  |
@@ -76,10 +78,25 @@
 | sw | `0100011` | rs1      | imm | rd      | Null | `010` | **M\[rs1+imm][31:0]** = **rs2\[31:0]** | `sw t0, 0(t1)`  |
 
 
-| J-Type | opcode   | target | 使用方式                                                     | 举例        |
-| ------ | -------- | ------ | ------------------------------------------------------------ | ----------- |
-| j      | `000010` | target | 跳转到某个标签对应的 **PC** 值                               | `j label`   |
-| jal    | `000011` | target | 跳转到某个标签对应的 **PC** 值，并将当前 **PC + 4** 存入 **$ra** 寄存器中 | `jal label` |
+| B-Type | opcode   | rs1      | rs2     | rd      | fun7   | fun3     | 使用方式                             | 举例              |
+| ------ | -------- | ------- | ------- | ------- | ------- | -------- | ------------------------------------ | ----------------- |
+| beq | `1100011` | rs1      | rs2 | rd      | Null | `000` | **PC += (rs1 == rs2) ? {imm,1’b0} : 4** | `beq t0, t1, label`  |
+| bne | `1100011` | rs1      | rs2 | rd      | Null | `001` | **PC += (rs1 != rs2) ? {imm,1’b0} : 4** | `bne t0, t1, label`  |
+| blt | `1100011` | rs1      | rs2 | rd      | Null | `100` | **PC += (rs1 < rs2) ? {imm,1’b0} : 4** | `blt t0, t1, label`  |
+| bge | `1100011` | rs1      | rs2 | rd      | Null | `101` | **PC += (rs1 >= rs2) ? {imm,1’b0} : 4** | `bge t0, t1, label`  |
+| bltu | `1100011` | rs1      | rs2 | rd      | Null | `110` | **PC += (rs1(unsigned) < rs2(unsigned)) ? {imm,1’b0} : 4** | `bltu t0, t1, label`  |
+| bgeu | `1100011` | rs1      | rs2 | rd      | Null | `111` | **PC += (rs1(unsigned) >= rs2(unsigned)) ? {imm,1’b0} : 4** | `bgeu t0, t1, label`  |
+
+| J-Type | opcode   | rs1      | rs2     | rd      | fun7   | fun3     | 使用方式                             | 举例              |
+| ------ | -------- | ------- | ------- | ------- | ------- | -------- | ------------------------------------ | ----------------- |
+| jal    | `1101111` | NULL | NULL | rd | NULL | NULL | **rd = PC + 4; PC += imm** | `jal t0, label` |
+| jalr   | `1100111` | rs1 | imm | rd | NULL | NULL | **rd = PC + 4; PC = rs1 + imm** | `jalr t0, 0(t1)` |
+
+| Bonus | opcode   | rs1      | rs2     | rd      | fun7   | fun3     | 使用方式                             | 举例              |
+| ------ | -------- | ------- | ------- | ------- | ------- | -------- | ------------------------------------ | ----------------- |
+| lui    | `0110111` | NULL | NULL | rd | NULL | NULL | **rd = imm << 12** | `lui t0, 0x80000` |
+| auipc | `0010111` | NULL | NULL | rd | NULL | NULL | **rd = PC + imm << 12** | `auipc t0, 0x80000` |
+| ecall | `1110011`| NULL | NULL | NULL | `0000000`| `000` |**r7 = 0 在LED上输出a0** **r7 = 1 读入Switch上读入值储存到a0**| `ecall` |
 
 - 参考的 ISA：**MiniSys-1A，MIPS**
 
