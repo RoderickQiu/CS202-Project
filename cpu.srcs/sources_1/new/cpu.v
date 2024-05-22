@@ -187,20 +187,15 @@ module cpu (
         .tub_sel(tub_sel)
     );
 
-    // audio u_audio (
-    //     .clk(clk_in),
-    //     .slow_clk(audio_clk),
-    //     .rst(rst_in),
-    //     .enable(audio_control),
-    //     .cur_note(Reg_out2),
-    //     .buzzer(buzzer)
-    // );
+    audio u_audio (
+        .clk(clk_in),
+        .slow_clk(audio_clk),
+        .rst(rst_in),
+        .enable(audio_control),
+        .cur_note(Reg_out2),
+        .buzzer(buzzer)
+    );
 
-    print u_print(.clk(clk_in),.in_init(led2N4ing),.new(Reg_tmp),.out(led2N4[15:0]),.Stop(Stop));
-    // TODO for cur_note save
-    // we should save cur_note to audio_buf_mem
-    // or we just test it without buf_mem first
-    // because the current clock is slow
-    // maybe just use asm to give the note value
+    // print u_print(.clk(clk_in),.in_init(led2N4ing),.new(Reg_tmp),.out(led2N4[15:0]),.Stop(Stop));
 
 endmodule

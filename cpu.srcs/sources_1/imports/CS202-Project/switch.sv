@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module switch (
     input clk,
     input rst,
@@ -8,7 +9,7 @@ module switch (
 );
     /*
         100:all unsigned
-        101:8bit midï¿½?signed
+        101:8bit midï¿??signed
         001:8bit right signed
         110:16bit unsigned
         111:12bit unsigned

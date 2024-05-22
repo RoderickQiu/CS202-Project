@@ -17,13 +17,7 @@ module stage_mem (
 
     wire trans_clk;
     assign trans_clk = !clk;
-    // CPU work on normal mode when kickOff is 1
-    // CPU work on Uart communicate mode when kickOff is 0
-    wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
 
-    // wire [31:0] out_mem;
-    // wire [15:0] out_oi;
-    //    wire write = mem_write | oi_write;
     wire [13:0] _0;
     assign _0 = 0;
     dmem32 dmem (

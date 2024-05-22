@@ -1,11 +1,12 @@
+`timescale 1ns / 1ps
 module led (
     input clk,  // 时钟信号
     input rst,  // 复位信号
     input [5:0]control,
     input [2:0]led_control,
-    input [23:0] ledwdata,  //  写到LED模块的数据，注意数据线只�??????16�??????
-    output  [7:0] ledout_w,  //  向板子上输出�??????24位LED信号
-    output reg [15:0] ledout  //  向板子上输出�??????24位LED信号
+    input [23:0] ledwdata,  //  写到LED模块的数据，注意数据线只�???????16�???????
+    output  [7:0] ledout_w,  //  向板子上输出�???????24位LED信号
+    output reg [15:0] ledout  //  向板子上输出�???????24位LED信号
 );
 
     int i=0;

@@ -6,7 +6,7 @@ module test ();
     wire tx = 0;
     wire [3:0] key_row = 4'b0, key_col = 4'b0;
     wire [3:0] r , g,b;
-    wire x,xx,xxx;
+    wire x,xx,xxx,hs,vs;
     assign {x,xx,xxx}=3'b100;
     wire [7:0] seg_an, seg_out;
     cpu cpu1 (
@@ -17,10 +17,6 @@ module test ();
         .switch2N4(switch2N4),
         .led2N4(led2N4),
         .seg_out(seg_out),
-        // UART ports
-        .start_pg(start_pg),
-        .rx(rx),
-        .tx(tx),
         .r(r),
         .g(g),
         .b(b),
