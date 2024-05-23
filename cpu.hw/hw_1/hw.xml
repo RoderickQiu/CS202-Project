@@ -9,8 +9,8 @@
     <Object name="xc7a100t_0" gui_info="">
       <Properties Property="FULL_PROBES.FILE" value=""/>
       <Properties Property="PROBES.FILE" value=""/>
-      <Properties Property="PROGRAM.HW_BITSTREAM" value="$_project_name_.runs/impl_1/$_project_name_.bit"/>
-      <Properties Property="SLR.COUNT" value="c:/Users/冯照航/AppData/Roaming/Xilinx/Vivado/1"/>
+      <Properties Property="PROGRAM.HW_BITSTREAM" value="$_project_name__test2.bit"/>
+      <Properties Property="SLR.COUNT" value="C:/Users/冯照航/AppData/Roaming/Xilinx/Vivado/1"/>
     </Object>
   </ObjectList>
   <probeset name="hw project" active="false"/>

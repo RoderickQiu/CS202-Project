@@ -4,7 +4,7 @@
 module stage_if (
     input clk,
     input rst,
-    input clk_p,
+    // input clk_p,
     input branch,
     input zero,
     input Jump,
@@ -13,12 +13,6 @@ module stage_if (
     input [31:0] imm,
     output [31:0] instruct,
     output reg [31:0] pc,  // 4-based, so addr = pc[15:2]
-    input upg_rst_i,  // UPG reset (Active High)
-    input upg_clk_i,  // UPG clock (10MHz)
-    input upg_wen_i,  // UPG write enable
-    input [14:0] upg_adr_i,  // UPG write address
-    input [31:0] upg_dat_i,  // UPG write data
-    input upg_done_i,  // 1 if program finish
     output reg Stop
 );
     reg [2:0]cnt=0;

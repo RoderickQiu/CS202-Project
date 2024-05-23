@@ -5,12 +5,16 @@ module print (
     input [31:0]new,
     output reg [31:0]  out
 );
-
+    reg [15:0]cnt=0;
+    reg f=0;
     always @(posedge clk ) begin
-        if(Stop&& new!=0)begin
-            out=new;
+        if(Stop&& (f || new!=0))begin
+            cnt<=cnt+1;
+            f<=1;
+            out<={cnt,new[15:0]};
         end else begin
-            out={16'b00000000_00000000,in_init};
+            out<={16'b00000000_00000000,in_init};
+            cnt<=0;
         end
     end
 endmodule
