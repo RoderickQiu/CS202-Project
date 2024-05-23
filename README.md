@@ -480,13 +480,59 @@
 
 对于本次项目，一个明显的感受就是由易、到难，再到了然：先是觉得通过理论课 datapath 明晰的学习和实验课提供的框架，完成这个项目只是时间问题。后来发现在自己编写的过程中会遇见大大小小的问题，包括代码组织，开发环境配置，各个结构之间的协调，等等等等。最严重的问题莫过于摸不着头脑的测试环节：你就是发现了问题，但是搞不清楚它可能发生在哪里，只好一个个试。加上跑一个bitstream到后期需要半个多小时，导致整一个调试过程变得非常冗长。
 
-最后，当经历了所有工程之后，对于单周期 CPU 的编写过程已经基本了然于心，每一行代码都十分熟悉，更加深了对简单的单周期 CPU 的理解。
+最后，当经历了所有工程之后，对于单周期 CPU 的编写过程已经基本了然于心，每一行代码都十分熟悉，更加深了对简单的单周期 CPU 的理解。同时，也对于硬件的设计有了更深的认识，对于时序逻辑的设计也有了更深的认识。
 
 ------
 
 ### Bonus 对应功能点的设计说明
 
-#### 1. 实现对复杂外设接口的支持
+#### 1. 实现扩展指令
+##### lui的实现
+将立即数左移12位,然后存入rd寄存器,在我们的测试样例中,我们将Switch以及LED的地址,通过lui命令+addi命令导入寄存器,然后通过lw命令读取内存,最后通过sw命令将输出存入内存中。
+
+其中的核心代码如下：
+
+```assembly
+    #switch:1111_1100_000x_xx00
+	#led:1111_1100_001x_xx00
+	lui t2, 0x1
+    lui t0, 0xfffff
+    addi t0, t0, -1024
+    add t0, t0, t2
+    lui t1, 0xfffff
+    addi t1, t1, -992
+    add t1, t1, t2
+```
+
+##### auipc的实现
+将PC左移12位,然后存入rd寄存器,在我们的测试样例中,我们将Switch以及LED的地址,通过auipc命令+addi命令导入寄存器,然后通过lw命令读取内存,最后通过sw命令将输出存入内存中。
+
+其中的核心代码如下：
+
+```assembly
+.data
+	Switch: .word 0xfffffc00
+	Led: .word 0xfffffc10
+.text
+	auipc x5, 0x0000fc10
+	addi x5, x5, 0
+	auipc x6, 0x0000fc10
+	addi x6, x6, 0xfffffffc 
+```
+##### ecall的实现
+
+ecall指令是一个系统调用指令，用于在用户态和内核态之间进行切换。在我们的测试样例中, 当`a7 = 0`的时候,调用用ecall指令便会从Switch中读取数据并且储存到a0寄存器当中，当`a7 = 1`的时候，调用ecall指令便会从a0寄存器中读取值并且通过LED的方式输出出来。
+
+其中的核心代码如下：
+
+```assembly
+    li a7, 0
+    ecall
+    li a7, 1
+    ecall
+```
+
+#### 2. 实现对复杂外设接口的支持
 
 ##### 七段数码管：
 
@@ -502,6 +548,46 @@
 
 其中核心代码如下：
 
+```verilog
+always @(*) begin
+    case (divider_clk)
+        3'b000: begin
+            tub_sel = ~8'b00000001;
+            seg_in = p0;
+        end
+        3'b001: begin
+            tub_sel = ~8'b00000010;
+            seg_in = p1;
+        end
+        3'b010: begin
+            tub_sel = ~8'b00000100;
+            seg_in = p2;
+        end
+        3'b011: begin
+            tub_sel = ~8'b00001000;
+            seg_in = p3;
+        end
+        3'b100: begin
+            tub_sel = ~8'b00010000;
+            seg_in = p4;
+        end
+        3'b101: begin
+            tub_sel = ~8'b00100000;
+            seg_in = p5;
+        end
+        3'b110: begin
+            tub_sel = ~8'b01000000;
+            seg_in = p6;
+        end
+        3'b111: begin
+            tub_sel = ~8'b10000000;
+            seg_in = p7;
+        end
+        default: tub_sel = ~8'b00000000;
+    endcase
+end
+```
+
 ##### VGA：
 
 该模块的功能是控制 VGA 的显示。读入输入的信息，转化为阵列字体的信号，存在一个个字符格（`vga_char_set`）中，并进行二维扫描，在 VGA 信号扫描到对应亮起的像素点时输出 RGB 全 1 信号（白色）。
@@ -515,22 +601,62 @@
 | `hs`      | 水平同步信号                            |
 | `vs`      | 垂直同步信号                            |
 
+```verilog
+//analyze and get output, for 1 being lit up
+always @(posedge pclk or posedge rst) begin
+    if (rst) begin
+        r <= 0;
+        g <= 0;
+        b <= 0;
+    end
+    else if (vcount>=UP_BOUND && vcount<=DOWN_BOUND
+             && hcount>=LEFT_BOUND && hcount<=RIGHT_BOUND) begin
+        if (hcount >= left_pos && hcount <= right_pos) begin
+            if (vcount >= up_pos_0 && vcount <= down_pos_0) begin
+                if (p0[hcount-left_pos][vcount-up_pos_0]) begin
+                    r <= 4'b1111;
+                    g <= 4'b1111;
+                    b <= 4'b1111;
+                end else begin
+                    r <= 4'b0000;
+                    g <= 4'b0000;
+                    b <= 4'b0000;
+                end
+            end else begin
+                r <= 4'b0000;
+                g <= 4'b0000;
+                b <= 4'b0000;
+            end
+        end else begin
+            r <= 4'b0000;
+            g <= 4'b0000;
+            b <= 4'b0000;
+        end
+    end else begin
+        r <= 4'b0000;
+        g <= 4'b0000;
+        b <= 4'b0000;
+    end
+end
+```
 
-### Bonus 测试说明
+下面是控制模块的核心代码：
 
-首先，分别进行仿真，仿真无问题；
-
-然后在单独场景下测试,将小键盘的输出给到 LED 灯，测试通过；
-
-将七段数码管显示拨码开关对应值，测试通过；
-
-然后上板测试，发现无反应；
-
-将控制信号全部绕过，使键盘和数码管始终激活，测试正常；
-
-重写控制信号逻辑，单独由 `keyboard_ctrl` 模块控制，再次上板测试，测试通过。 
-
-功能最后完成效果已在答辩展示，具体细节参照视频
+```verilog
+//control data from val
+always @(posedge clk, posedge rst) begin
+    if (rst) begin
+        data0 <= 35'b0;  //reset, all zero
+    end else begin
+        data0[35:30] <= val[23:20];
+        data0[29:24] <= val[19:16];
+        data0[23:18] <= val[15:12];
+        data0[17:12] <= val[11:8];
+        data0[11:6]  <= val[7:4];
+        data0[5:0]   <= val[3:0];
+    end
+end
+```
 
 ### Bonus 问题与总结
 
@@ -538,10 +664,7 @@
 
 - 七段数码显示管显示数字重叠
   - 由数码管选择信号变化频率过快导致，由于选择信号频率变化过快，数码管无法快速反映出选择信号的变化，所以同时显示三个数字的七段数码信号。将其由系统时钟分频为周期为 2ms 左右的时钟后解决
-- 键盘输入后，显示区显示四个同样数字
-  - 由于键盘检测频率过快，按下一次输入了多个重复数字。分频时钟后解决
-- 键盘输入信号无法传入 CPU 参与运算
-  - 单独写了信号控制模块后解决
+- auipc命令需要用到data memory,但是在verilog里第一个word的内容默认从地址1开始, 但是rars里是从0开始,所以需要在前面垫1个空的全0的word.
 - 修改自己以前写的 VGA 模块后发现不显示内容，按下复位按钮才有信号
   - 忘记本次 CPU 是复位高电平有效，更改复位信号敏感值和敏感沿后解决
 - VGA 在显示时非显示区域也会有一些显示
