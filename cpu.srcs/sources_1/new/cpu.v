@@ -170,7 +170,6 @@ module cpu (
         .ledout_w(led2N4[23:16]),
         .ledout(led2N4[15:0]),
         .ledtoseg(ledtoseg)
-
     );
 
     switch u_sw (
@@ -204,6 +203,7 @@ module cpu (
         .rst(rst_in),
         .cur_note(Reg_tmp[3:0]),
         .buzzer(buzzer),
+        .is_audio(is_audio),
         .stop(Stop)
     );
 

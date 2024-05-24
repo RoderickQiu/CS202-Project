@@ -5,6 +5,7 @@ module audio (
     input rst,
     input stop,
     input [3:0] cur_note,
+    input is_audio,
     output reg [0:0] buzzer = 0
  );
 
@@ -33,7 +34,7 @@ reg[29:0] cur_half_period = note_period;
 integer cur_half_period_count = 0;      // inverse buzzer if cur_half_period_count > note_period
 
 always @(posedge clk) begin
-    if(rst) begin
+    if(rst || !is_audio) begin
         cur_half_period_count <= 0;
         buzzer <= 0;
     end else begin
