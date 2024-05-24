@@ -43,6 +43,7 @@ module cpu (
     wire [1:0] a7;
     wire [31:0] p_out;
     wire Stop;
+    wire [31:0]ledtoseg;
     initial begin
         divider_clk = 0;
         divider_audio = 0;
@@ -166,9 +167,11 @@ module cpu (
         .rst(rst_in),
         .control(pc[7:2]),
         .led_control(led_control),
-        .ledwdata(Reg_out2[23:0]),
+        .ledwdata(Reg_out2),
         .ledout_w(led2N4[23:16]),
-        .ledout(led2N4[15:0])
+        .ledout(led2N4[15:0]),
+        .ledtoseg(ledtoseg)
+        
     );
 
     switch u_sw (
@@ -196,21 +199,21 @@ module cpu (
     seg u_seg (
         .clk(clk_in),
         .rst(rst_in),
-        .val(audio_out),
+        .val(p_out),
         .seg_out(seg_out),
         .tub_sel(tub_sel)
     );
 
-    audio u_audio (
-        .clk(clk_in),
-        .enable(1'b0), 
-        .music(buzzer)
-    );
+    // audio u_audio ( 
+    //     .clk(clk_in),
+    //     .enable(1'b0), 
+    //     .music(buzzer)
+    // );
 
     print u_print (
         .Stop(Stop),
         .clk(clk_p),
-        .in_init(led2N4[15:0]),
+        .in_init(ledtoseg),
         .new(Reg_tmp),
         .out(p_out)
     );

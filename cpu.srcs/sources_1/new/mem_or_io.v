@@ -14,7 +14,7 @@ module mem_or_io (
     output audio_control
 );
 
-    assign switch_control = a7==2'b10 ? 3'b100:
+    assign switch_control = a7==2'b10 ? 3'b110:
     ((mem_read && alu_result_addr[13:3]==`SWITCH_MEM) ?
     alu_result_addr[2:0]:3'b000);
     assign led_control = a7==2'b11 ? 3'b100:

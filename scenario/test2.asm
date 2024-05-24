@@ -6,14 +6,14 @@
 #Test2_5:input: 111:12bit unsigned output: 111:12bit_res
 #Test2_6:input:  16bit unsigned  output: 110:8bit_right
 #Test2_7:input:  16bit unsigned  output: 110:8bit_right
+.data
+	Switch: .word 0xfffffc00
+	Led: .word 0xfffffc20
 .text
-	lui t2, 0x1
-    lui t0, 0xfffff
-    addi t0, t0, -1024
-    add t0, t0, t2
-    lui t1, 0xfffff
-    addi t1, t1, -992
-    add t1, t1, t2
+    la a0, Switch
+	lw t0, 0(a0)
+	la a0, Led
+	lw t1, 0(a0)
     addi s10, t0, 256
     
     lw s9, 16(t0)

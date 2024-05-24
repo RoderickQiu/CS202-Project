@@ -1,7 +1,7 @@
 module print (
     input clk,  // 时钟信号
     input Stop,  // 复位信号
-    input [15:0]in_init,
+    input [31:0]in_init,
     input [31:0]new,
     output reg [31:0]  out
 );
@@ -13,7 +13,7 @@ module print (
             f<=1;
             out<={cnt,new[15:0]};
         end else begin
-            out<={16'b00000000_00000000,in_init};
+            out<=in_init;
             cnt<=0;
         end
     end
