@@ -13,8 +13,7 @@ module stage_mem (
     input [1:0] a7,
     output [31:0] tmp_data,
     output [2:0] switch_control,
-    output [2:0] led_control,
-    output audio_control
+    output [2:0] led_control
 );
 
     wire trans_clk;
@@ -26,19 +25,19 @@ module stage_mem (
     // wire [15:0] out_oi;
     //    wire write = mem_write | oi_write;
     wire [13:0] _0;
-    reg [13:0]mem_p = `OUT_START-1;
-    always @(negedge clk_p ) begin
-        if(Stop)begin
-            mem_p=mem_p+1;
+    reg  [13:0] mem_p;
+    always @(negedge clk_p) begin
+        if (Stop) begin
+            mem_p = mem_p + 1;
         end else begin
-            mem_p=`OUT_START -1;
+            mem_p = `OUT_START - 1;
         end
     end
     assign _0 = 0;
     dmem32 dmem (
         .clka (trans_clk),
         .wea  (mem_write),
-        .addra(Stop?mem_p:(a7[1] ? _0 : mem_write_addr[15:2])),
+        .addra(Stop ? mem_p : (a7[1] ? _0 : mem_write_addr[15:2])),
         .dina (mem_write_data),
         .douta(tmp_data)
     );
@@ -50,8 +49,7 @@ module stage_mem (
         .mem_write(mem_write),
         .alu_result_addr(mem_write_addr[15:2]),
         .led_control(led_control),
-        .switch_control(switch_control),
-        .audio_control(audio_control)
+        .switch_control(switch_control)
         // .Result(tmp_data)
     );
 endmodule

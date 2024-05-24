@@ -31,40 +31,50 @@ module cpu (
     wire [6:0] func7;
     wire [2:0] func3;
     wire zero, Jump, rst_in;
-    reg clk, audio_clk;  // the using clock signals
+    reg clk, clk_mem, clk_p, clk_audio;  // the using clock signals
     wire [31:0] data_switch;
     wire [2:0] led_control, switch_control;
-    wire audio_control;
-    reg [25:0]  divider_audio;   
-    reg [23:0] divider_clk;
-    reg [21:0] dclk_mem;
+    reg [25:0] divider_clk;
+    reg [23:0] dclk_mem;
     reg [26:0] divider_clk_p;
-    reg clk_mem,clk_p;
+    reg [23:0] divider_clk_audio;
     wire [1:0] a7;
     wire [31:0] p_out;
     wire Stop;
-    wire [31:0]ledtoseg;
+    wire [31:0] ledtoseg;
+    wire is_audio;
+    assign is_audio = switch2N4[20];
+
     initial begin
         divider_clk = 0;
-        divider_audio = 0;
         clk = 0;
         clk_p = 0;
-        divider_clk_p=0;
-        audio_clk = 0;
+        divider_clk_p = 0;
+        clk_audio = 0;
+        divider_clk_audio = 0;
         dclk_mem = 0;
         clk_mem = 0;
     end
+
     always @(posedge clk_in) begin
         divider_clk_p <= divider_clk_p + 1;
         if (divider_clk_p == 4) begin
             clk_p <= ~clk_p;
         end
     end
+
+    always @(posedge clk_in) begin
+        divider_clk_audio <= divider_clk_audio + 1;
+        if (divider_clk_audio == 4) begin
+            clk_audio <= ~clk_audio;
+        end
+    end
+
     always @(posedge clk_in) begin
         divider_clk <= divider_clk + 1;
         if (divider_clk == 4) begin
             clk <= ~clk;
-             divider_clk <= 0;
+            divider_clk <= 0;
         end
     end
 
@@ -72,14 +82,7 @@ module cpu (
         dclk_mem <= dclk_mem + 1;
         if (dclk_mem == 1) begin
             clk_mem  <= ~clk_mem;
-             dclk_mem <= 0;
-        end
-    end
-    always @(posedge clk_in) begin
-        divider_audio <= divider_audio + 1;
-        if (divider_audio == 64) begin
-            audio_clk <= ~audio_clk;
-            //sdivider_audio <= 0;
+            dclk_mem <= 0;
         end
     end
 
@@ -89,7 +92,6 @@ module cpu (
     stage_if IF (
         .clk(clk),
         .rst(rst_in),
-        // .clk_p(clk_p),
         .branch(Branch),
         .zero(zero),
         .Jump(Jump),
@@ -101,6 +103,7 @@ module cpu (
         .Stop(Stop)
     );
     wire [31:0] Check;
+
     // ID part: Instruction decode
     stage_id ID (
         .Check(Check),
@@ -147,14 +150,13 @@ module cpu (
     stage_mem MEM (
         .clk(clk_mem),
         .rst(rst_in),
-        .clk_p(clk_p),
+        .clk_p(is_audio ? clk_audio : clk_p),
         .Stop(Stop),
         .mem_read(Memread),
         .mem_write(Memwrite),
         .data_switch(data_switch),
         .switch_control(switch_control),
         .led_control(led_control),
-        .audio_control(audio_control),
         .mem_write_addr(Result),
         .mem_write_data(Reg_out2),
         .a7(a7),
@@ -171,7 +173,7 @@ module cpu (
         .ledout_w(led2N4[23:16]),
         .ledout(led2N4[15:0]),
         .ledtoseg(ledtoseg)
-        
+
     );
 
     switch u_sw (
@@ -194,21 +196,21 @@ module cpu (
         .vs (vs)
     );
 
-    wire [31:0] audio_out;
-
     seg u_seg (
         .clk(clk_in),
         .rst(rst_in),
-        .val(p_out),
+        .val(is_audio ? {28'b0, Reg_tmp[3:0]} : p_out),
         .seg_out(seg_out),
         .tub_sel(tub_sel)
     );
 
-    // audio u_audio ( 
-    //     .clk(clk_in),
-    //     .enable(1'b0), 
-    //     .music(buzzer)
-    // );
+    audio u_audio (
+        .clk(clk_in),
+        .rst(rst_in),
+        .cur_note(Reg_tmp[3:0]),
+        .buzzer(buzzer),
+        .stop(Stop)
+    );
 
     print u_print (
         .Stop(Stop),

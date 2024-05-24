@@ -15,39 +15,42 @@ def main():
     for line in lines:
         notes.append(line.strip())
 
+    output = ""
     for note in notes:
         if note == "do_low":
-            print("0001", end="")
+            output += "1, "
         elif note == "re_low":
-            print("0010", end="")
-        elif note == "me_low":
-            print("0011", end="")
+            output += "2, "
+        elif note == "mi_low":
+            output += "3, "
         elif note == "fa_low":
-            print("0100", end="")
+            output += "4, "
         elif note == "so_low":
-            print("0101", end="")
+            output += "5, "
         elif note == "la_low":
-            print("0110", end="")
+            output += "6, "
         elif note == "si_low":
-            print("0111", end="")
+            output += "7, "
         elif note == "do":
-            print("1000", end="")
+            output += "8, "
         elif note == "re":
-            print("1001", end="")
-        elif note == "me":
-            print("1010", end="")
+            output += "9, "
+        elif note == "mi":
+            output += "10, "
         elif note == "fa":
-            print("1011", end="")
+            output += "11, "
         elif note == "so":
-            print("1100", end="")
+            output += "12, "
         elif note == "la":
-            print("1101", end="")
+            output += "13, "
         elif note == "si":
-            print("1110", end="")
+            output += "14, "
         else:
-            print("0000", end="")
+            output += "0, "
 
-    print("\\000")
+    print(output + "15")  # Add 15 as the ending signal
+
+    print("Size of notes:", len(notes), "notes.")
 
 
 if __name__ == "__main__":

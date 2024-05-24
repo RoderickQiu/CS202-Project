@@ -1,41 +1,59 @@
 import sys
 
 
-def generate_coe():
-    if len(sys.argv) != 4:
-        print("Usage: python coe-gen.py <from_file> <to_file> <depth>")
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python music-gen.py <input_file>")
         return
 
-    from_file = sys.argv[1]
-    to_file = sys.argv[2]
-    depth = int(sys.argv[3])
+    input_file = sys.argv[1]
 
-    # Open the file to read the instructions
-    with open(from_file, "r") as f:
-        instructions = f.readlines()
+    with open(input_file, "r") as f:
+        lines = f.readlines()
 
-    # Open the file to write the .coe file
-    with open(to_file, "w") as f:
-        # Write the header
-        f.write("memory_initialization_radix = 16;\n")
-        f.write("memory_initialization_vector=\n")
+    notes = []
+    for line in lines:
+        notes.append(line.strip())
 
-        # Write the instructions, and if the required depth is longer than the instructions, fill the rest with 0
-        for i in range(depth):
-            if i != depth - 1:
-                if i < len(instructions):
-                    f.write(instructions[i].strip() + ",\n")
-                else:
-                    f.write("00000000,\n")
-            else:
-                if i < len(instructions):
-                    f.write(instructions[i].strip() + ";\n")
-                else:
-                    f.write("00000000;\n")
+    output = ""
+    for note in notes:
+        if note == "do_low":
+            output += "1, "
+        elif note == "re_low":
+            output += "2, "
+        elif note == "mi_low":
+            output += "3, "
+        elif note == "fa_low":
+            output += "4, "
+        elif note == "so_low":
+            output += "5, "
+        elif note == "la_low":
+            output += "6, "
+        elif note == "si_low":
+            output += "7, "
+        elif note == "do":
+            output += "8, "
+        elif note == "re":
+            output += "9, "
+        elif note == "mi":
+            output += "10, "
+        elif note == "fa":
+            output += "11, "
+        elif note == "so":
+            output += "12, "
+        elif note == "la":
+            output += "13, "
+        elif note == "si":
+            output += "14, "
+        else:
+            output += "0, "
 
-    print(f"Generated {to_file} file.")
+        output += "0, "  # Add a delay
+
+    print(output + "15")  # Add 15 as the ending signal
+
+    print("Size of notes:", len(notes), "notes.")
 
 
-# Use the generate_coe function to create a .coe file
-if __name__ == '__main__':
-    generate_coe()
+if __name__ == "__main__":
+    main()
