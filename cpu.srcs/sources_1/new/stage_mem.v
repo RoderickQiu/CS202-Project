@@ -7,7 +7,6 @@ module stage_mem (
     input Stop,
     input mem_read,
     input mem_write,
-    input [31:0] data_switch,
     input [31:0] mem_write_addr,  // orgininate from ALU
     input [31:0] mem_write_data,
     input [1:0] a7,

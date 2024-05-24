@@ -2,7 +2,6 @@
 `include "define.v"
 
 module register (
-    output  [31:0]Check,
     input [4:0] id1,
     input [4:0] id2,
     input [4:0] idwr,

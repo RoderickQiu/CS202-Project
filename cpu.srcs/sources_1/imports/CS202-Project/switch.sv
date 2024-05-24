@@ -1,15 +1,13 @@
 `timescale 1ns / 1ps
 module switch (
-    input clk,
     input rst,
     input [2:0]switch_control,
     input [23:0] switch_rdata,
-    input Signed,
     output reg [31:0] switch_wdata  //  传入给memorio的data
 );
     /*
         100:all unsigned
-        101:8bit mid�??signed
+        101:8bit mid�??signed
         001:8bit right signed
         110:16bit unsigned
         111:12bit unsigned

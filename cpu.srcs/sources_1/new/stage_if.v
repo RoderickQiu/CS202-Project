@@ -4,7 +4,6 @@
 module stage_if (
     input clk,
     input rst,
-    // input clk_p,
     input branch,
     input zero,
     input Jump,

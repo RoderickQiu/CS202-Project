@@ -102,11 +102,9 @@ module cpu (
         .JR(JR),
         .Stop(Stop)
     );
-    wire [31:0] Check;
-
+    
     // ID part: Instruction decode
     stage_id ID (
-        .Check(Check),
         .clk(clk),
         .rst(rst_in),
         .Instruction(Instruction),
@@ -154,7 +152,6 @@ module cpu (
         .Stop(Stop),
         .mem_read(Memread),
         .mem_write(Memwrite),
-        .data_switch(data_switch),
         .switch_control(switch_control),
         .led_control(led_control),
         .mem_write_addr(Result),
