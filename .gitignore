@@ -68,6 +68,8 @@ Temporary Items
 !*.bmp
 !*.gif
 !*.tiff
+!*.pdf
+
 !*.py
 !*.h
 !*.cpp

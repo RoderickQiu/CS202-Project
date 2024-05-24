@@ -174,11 +174,9 @@ module cpu (
     );
 
     switch u_sw (
-        .clk(clk),
         .rst(rst_in),
         .switch_control(switch_control),
         .switch_rdata(switch2N4),
-        .Signed(Signed),
         .switch_wdata(data_switch)
     );
 

@@ -39,8 +39,7 @@ module register (
 
     assign    rd1 = Reg[id1];
     assign    rd2 = Reg[id2];
-    assign    a7 = Reg[17][0];
-    assign    Check = Reg[1];    
+    assign    a7 = Reg[17][0];   
     always @(negedge clk) begin
         if (rst) begin
             for (i = 0; i < 32; i = i + 1) begin
