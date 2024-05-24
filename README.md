@@ -16,7 +16,16 @@
 | **邱天润** | **12210829** | CPU 硬件的实现和测试，七段数码管输出，VGA，软硬件协同案例，文档写作            | 1/3    |
 | **冯照航** | **12210722** | CPU 硬件的实现和测试，扩展指令的实现和测试，文档写作        | 1/3    |
 
-### 版本修改记录
+### 原计划
+
+- 进行整体的分工与设计 05/01
+- 各个独立模块的设计 05/01 - 05/07
+- 编写顶层模块并进行各模块的串联拼接 05/08 - 05/12
+- 进行测试场景1的仿真和测试05/12 - 05/13
+- 进行测试场景2的仿真和测试05/13 - 05/17
+- 进行Bonus部分的完善和测试05/17 - 05/20
+
+### 实施情况以及版本修改记录
 
 主要几个版本迭代：
 
@@ -98,11 +107,13 @@
 | auipc | `0010111` | NULL | NULL | rd | NULL | NULL | **rd = PC + imm << 12** | `auipc t0, 0x80000` |
 | ecall | `1110011`| NULL | NULL | NULL | `0000000`| `000` |**r7 = 0 在LED上输出a0** **r7 = 1 读入Switch上读入值储存到a0**| `ecall` |
 
-- 参考的 ISA：**MiniSys-1A，RISCV**
+  - 参考的 ISA：**MiniSys-1A，RISCV**
 
-- 寻址空间设计：使用了哈佛结构。指令中寻址单位为字节，实际中以字为数据位宽，即指令空间和数据空间读写位宽均为 **32 bits**，读写深度均为 **16384**
+  - 寻址空间设计：使用了哈佛结构。指令中寻址单位为字节，实际中以字为数据位宽，即指令空间和数据空间读写位宽均为 **32 bits**，读写深度均为 **16384**, 栈空间的基地址为`0xfffff800`。
 
-- 外设 IO 支持：软硬件协同以实现功能，采用 MMIO 外设。Switch LED对应的寻址范围的前四位都为0xFFFF, 后四位分别为1111_1100_000x_xx00和1111_1100_001x_xx00, 下列表格展示了不同xxx组合的不同功能。
+- 外设 IO 支持：软硬件协同以实现功能，采用 MMIO 外设。Switch LED对应的寻址范围的前四位都为0xFFFF, 后四位分别为`1111_1100_000x_xx00`和`1111_1100_001x_xx00`, 下列表格展示了不同xxx组合的不同功能。采用轮询的方式访问IO。
+
+    下列表格展示了不同xxx组合的不同功能。
 
   | IO设备         | xxx 3bit |
   | ------------------- | ----------- |
@@ -118,7 +129,7 @@
   | 七段数码显示输出    | 绑定对应的Register  |
   | VGA 输出            | 绑定对应的Register  |
 
-- CPU 为单周期 CPU，CPI 接近为 1，不支持 Pipeline
+- CPU 为单周期 CPU，CPI 接近为 1，不支持 Pipeline，但是是 Pipeline-ready 的设计，分为`stage_if`，`stage_id`等 `stages`，可以方便地进行 Pipeline 的扩展。
 
 #### 2.CPU 接口：
 
@@ -230,178 +241,321 @@
 - VGA 输出：接受来自 IO 给定的模式选择信号，通过储存好的字阵选择信号输出对应的模式。
 
 #### 3.CPU 内部结构（配图仅供参考，端口以表格为准）：
-项目结构
-```shell
-├── imports
-│   ├── led.sv
-│   └── switch.sv
-├── ip
-│   ├── dmem32
-│   ├── prgrom_1
-└── new
-    ├── cpu.v
-    ├── stage_if.v
-    ├── stage_id.v
-    ├── stage_ex.v
-    ├── stage_mem.v
-    ├── alu_control.v
-    ├── instruction_control.v
-    ├── parse_instruction.v
-    ├── register.v
-    ├── mem_or_io.v
-    ├── audio.v
-    ├── define.v
-    ├── print.v
-    ├── seg.sv
-    ├── vga.v
-    └── vga_char_set.v
-```
+
+- 项目结构
+    ```shell
+    ├── imports
+    │   ├── led.sv
+    │   └── switch.sv
+    ├── ip
+    │   ├── dmem32
+    │   ├── prgrom_1
+    └── new
+        ├── cpu.v
+        ├── stage_if.v
+        ├── stage_id.v
+        ├── stage_ex.v
+        ├── stage_mem.v
+        ├── alu_control.v
+        ├── instruction_control.v
+        ├── parse_instruction.v
+        ├── register.v
+        ├── mem_or_io.v
+        ├── audio.v
+        ├── define.v
+        ├── print.v
+        ├── seg.sv
+        ├── vga.v
+        └── vga_char_set.v
+    ```
+
 - [CPU](cpu.srcs/sources_1/new/cpu.v)
 
   CPU 顶层模块，集成了 CPU 各组件及 IO 外设。
 
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `sample`           | 例子   |
+    ![CPU](photo/cpu.svg)
 
-以下是 CPU 内部重要 `wire` 的解释
-| wire 名称         | 功用描述                                           |
-| ----------------- | -------------------------------------------------- |
-| `sample`           | 例子   |
+    | 端口名称          | 功用描述                                     |
+    | ----------------- | -------------------------------------------- |
+    | `clk_in`输入   | 时钟信号 |
+    | `fpga_rst`输入 | 复位信号 |
+    | `switch2N4`输入 | 开关 |
+    | `led2N4`输出 | led |
+    | `r`输出 | VGA颜色 |
+    | `g`输出 | VGA颜色 |
+    | `b`输出 | VGA颜色 |
+    | `hs`输出 | 水平同步信号 |
+    | `vs`输出 | 垂直同步信号 |
+    | `seg_out`输出 | 8 位段码输出 |
+    | `tub_sel`输出 | 8 位使能信号输出 |
+    | `buzzer`输出 | 蜂鸣器信号 |
 
 - [Stage IF](cpu.srcs/sources_1/new/stage_if.v)
 
-  Instruction Fetch: 负责指令的获取以及 PC 的更新。
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `sample`           | 例子   |
+    Instruction Fetch: 负责指令的获取以及 PC 的更新。
 
-以下是 Stage IF 内部重要 `wire` 的解释
-| wire 名称         | 功用描述                                           |
-| ----------------- | -------------------------------------------------- |
-| `sample`           | 例子   |
+    ![Stage IF](photo/stage_if.svg)
+
+    | 端口名称          | 功用描述                                     |
+    | ----------------- | -------------------------------------------- |
+    | `clk`输入      | 时钟信号 |
+    | `rst输入` | 复位信号 |
+    | `branch`输入 | 判断是否为B-type |
+    | ` zero输入` | 判断B-type是否成功 |
+    | `Jump输入` | 判断是否为jump指令 |
+    | `rs1`输入 | rs1的数据 |
+    | `JR`输入 | 判断是否为jar指令 |
+    | `imm`输入 | 立即数 |
+    | `instruct`输出 | 当前指令 |
+    | `pc`输出 | 当前指令的地址 |
+    | `Stop`输出 | 是否已经执行完所有指令 |
 
 - [Stage ID](cpu.srcs/sources_1/new/stage_id.v)
 
   Instruction Decode: 负责指令的解析以及寄存器的读取。
 
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `sample`           | 例子   |
+    ![Stage ID](photo/stage_id.svg)
 
-以下是 Stage ID 内部重要 `wire` 的解释
-| wire 名称         | 功用描述                                           |
-| ----------------- | -------------------------------------------------- |
-| `sample`           | 例子   |
+    | 模块名称              | 功用描述         |
+    | ----------------- | -------------------------------------------------- |
+    | `parse_instruction`   | 将当前指令拆解   |
+    | `instruction_control` | 计算各种控制信号 |
+    | `register`            | 完成寄存器的操作 |
 
 - [Stage EX](cpu.srcs/sources_1/new/stage_ex.v)
 
     Execute: 负责指令的执行ALU以及计算。
 
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `sample`           | 例子   |
+    ![Stage EX](photo/stage_ex.svg)
 
-以下是 Stage EX 内部重要 `wire` 的解释
-| wire 名称         | 功用描述                                           |
-| ----------------- | -------------------------------------------------- |
-| `sample`           | 例子   |
+    | 端口名称          | 功用描述                                     |
+    | ----------------- | -------------------------------------------- |
+    | `read_data1`输入 | rs1的内容 |
+    | `read_data2`输入 | rs2的内容 |
+    | `pc输入` | pc |
+    | `imm32输入` | 立即数 |
+    | `aluop`输入 | aluop |
+    | `func7`输入 | func7 |
+    | `func3`输入 | func3 |
+    | `alu_src`输入 | ALUSRC |
+    | `alu_result`输出 | ALUResult |
+    | `zero`输出 | branch是否成功 |
+
 
 - [Stage MEM](cpu.srcs/sources_1/new/stage_mem.v)
 
     Memory: 负责数据的读写以及数据的存储。
 
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `sample`           | 例子   |
+    ![Stage MEM](photo/stage_mem.svg)
 
-以下是 Stage MEM 内部重要 `wire` 的解释
-| wire 名称         | 功用描述                                           |
-| ----------------- | -------------------------------------------------- |
-| `sample`           | 例子   |
+    | 端口名称          | 功用描述                                     |
+    | ----------------- | -------------------------------------------- |
+    | `clk`输入            | 时钟周期                |
+    | `rst`输入 | 复位信号 |
+    | `clk_p`输入 | 用于test2-111的时钟信号 |
+    | `mem_read`输入 | 是否从dmem读取 |
+    | `mem_write`输入 | 是否修改dmem |
+    | `mem_write_addr`输入 | 操作地址 |
+    | `mem_write_data`输入 | 修改数据 |
+    | `a7`输入 | ecall信号 |
+    | `tmp_data`输出 | dmem中的数据 |
+    | `switch_control`输出 | 开关的控制信号 |
+    | `led_control`输出 | led的控制信号 |
+
+    以下是 Stage MEM 内部重要 `wire` 的解释
+    | wire 名称         | 功用描述                                           |
+    | ----------------- | -------------------------------------------------- |
+    | `trans_clk`  | 将时钟转换为下降沿 |
+
+- [mem_or_io](cpu.srcs/sources_1/new/mem_or_io.v)
+
+    Memory: 负责计算led和switch的控制信号。
+
+    ![mem_or_io](photo/mem_or_io.svg)
+
+    | 端口名称              | 功用描述       |
+    | --------------------- | -------------- |
+    | `a7`输入              | ecall信号      |
+    | `mem_read`输入        | 是否从dmem读取 |
+    | `mem_write`输入       | 是否修改dmem   |
+    | `alu_result_addr`输入 | 操作地址       |
+    | `led_control`输出     | led的控制信号  |
+    | `switch_control`输出  | 开关的控制信号 |
 
 - [ALU Control](cpu.srcs/sources_1/new/alu_control.v)
 
     ALU 控制模块: 负责 ALU 控制信号的生成。
 
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `aluop`   输入        | 从Instruction Control中获取对应的Instruction Type|
-| `func7`   输入        | 辅助决定运算类型(ADD XOR AND 等)|
-| `func3`    输入       | 辅助决定运算类型(ADD XOR AND 等)|
-| `alu_ctrl`    输出       | 输出最终的运算类型(ADD XOR AND 等)|
+    ![ALU Control](photo/alu_control.svg)
+
+    | 端口名称          | 功用描述                                     |
+    | ----------------- | -------------------------------------------- |
+    | `aluop`   输入        | 从Instruction Control中获取对应的Instruction Type|
+    | `func7`   输入        | 辅助决定运算类型(ADD XOR AND 等)|
+    | `func3`    输入       | 辅助决定运算类型(ADD XOR AND 等)|
+    | `alu_ctrl`    输出       | 输出最终的运算类型(ADD XOR AND 等)|
 
 
 - [Instruction Control](cpu.srcs/sources_1/new/instruction_control.v)
 
     指令控制模块: 负责指令控制信号的生成。
 
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `opcode`   输入        | 该命令的opcode  |
-| `func3`   输入        | 该命令的func3  |
-| `rst`     输入      | 复位信号 |
-| `Branch`     输出     | 是否为Branch指令 |
-| `MemRead`     输出     | 是否需要读内存 |
-| `MemWrite`     输出     | 是否需要写内存 |
-| `MemtoReg`     输出     | 是否需要写寄存器 |
-| `RegWrite`     输出     | 是否需要写寄存器 |
-| `ALUSrc`     输出     | 是否需要立即数 |
-| `ALUOp`     输出     | ALU运算类型 |
-| `Jump`     输出     | 是否为Jump指令 |
-| `JR`     输出     | 是否为JumpReg指令|
-| `signed`     输出     | 是否为有符号数|
+    ![Instruction Control](photo/instruction_control.svg)
+
+    | 端口名称          | 功用描述                                     |
+    | ----------------- | -------------------------------------------- |
+    | `opcode`   输入        | 该命令的opcode  |
+    | `func3`   输入        | 该命令的func3  |
+    | `rst`     输入      | 复位信号 |
+    | `Branch`     输出     | 是否为Branch指令 |
+    | `MemRead`     输出     | 是否需要读内存 |
+    | `MemWrite`     输出     | 是否需要写内存 |
+    | `MemtoReg`     输出     | 是否需要写寄存器 |
+    | `RegWrite`     输出     | 是否需要写寄存器 |
+    | `ALUSrc`     输出     | 是否需要立即数 |
+    | `ALUOp`     输出     | ALU运算类型 |
+    | `Jump`     输出     | 是否为Jump指令 |
+    | `JR`     输出     | 是否为JumpReg指令|
+    | `signed`     输出     | 是否为有符号数|
 
 
 - [Parse Instruction](cpu.srcs/sources_1/new/parse_instruction.v)
 
     指令解析: 负责指令的解析。提取rs1, rs2, imm, rd等字段。
 
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `Instruction 输入`           | 输入指令   |
-| `rs1`     输出        | rs1  |
-| `rs2`     输出        | rs2  |
-| `imm`     输出        | imm  |
-| `rd`     输出        | rd
-| `opcode`     输出        | opcode  |
-| `func3`     输出        | func3  |
-| `func7`     输出        | func7
+    ![Parse Instruction](photo/parse_instruction.svg)
+
+    | 端口名称          | 功用描述                                     |
+    | ----------------- | -------------------------------------------- |
+    | `Instruction 输入`           | 输入指令   |
+    | `rs1`     输出        | rs1  |
+    | `rs2`     输出        | rs2  |
+    | `imm`     输出        | imm  |
+    | `rd`     输出        | rd
+    | `opcode`     输出        | opcode  |
+    | `func3`     输出        | func3  |
+    | `func7`     输出        | func7 |
 
 
 - [Register](cpu.srcs/sources_1/new/register.v)
 
     寄存器: 负责寄存器的读写。
 
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `id1` 输入     | rs1编号 |
-| `id2` 输入 | rs2编号 |
-| `idwr` 输入 | rd编号 |
-| RegWrite 输入 |  |
-| clk 输入 |  |
-| rst 输入 |  |
-| mem_to_reg |  |
-| mem_write_addr |  |
-|  |  |
+    ![Register](photo/register.svg)
 
-以下是 Register 内部重要 `wire` 的解释
-| wire 名称         | 功用描述                                           |
-| ----------------- | -------------------------------------------------- |
-| `sample`           | 例子   |
+    | 端口名称          | 功用描述                                     |
+    | ----------------- | -------------------------------------------- |
+    | `id1` 输入     | rs1编号 |
+    | `id2` 输入 | rs2编号 |
+    | `idwr` 输入 | rd编号 |
+    | `RegWrite` 输入 | 是否改写rd |
+    | `clk` 输入 | 时钟信号 |
+    | `rst` 输入 | 重置信号 |
+    | `mem_to_reg`输入 | 是否从mem输入 |
+    | `mem_write_addr`输入 | ALU Result |
+    | `tmp_data`输入 | dmem中的值 |
+    | `sw_data`输入 | 开关中的值 |
+    | `rd1`输出 | rs1的内容 |
+    | `rd2`输出 | rs2的内容 |
+    | `a7`输出 | a7的内容，用于判断ecall |
 
-- [Switch and LED](cpu.srcs/sources_1/new/mem_or_io.v)
+    以下是 Register 内部重要 `wire` 的解释
+    | wire 名称         | 功用描述                                           |
+    | ----------------- | -------------------------------------------------- |
+    | Reg     | 32个寄存器 |
+    | w_data | 存储应该写到rd里面的内容 |
 
-    Switch and LED: 负责 Switch 和 LED 的读写。
+- [Switch ](cpu.srcs/sources_1/imports/switch.sv)
 
-| 端口名称          | 功用描述                                     |
-| ----------------- | -------------------------------------------- |
-| `sample`           | 例子   |
+    Switch: 负责读取switch中的信号。
 
-以下是 Switch and LED 内部重要 `wire` 的解释
-| wire 名称         | 功用描述                                           |
-| ----------------- | -------------------------------------------------- |
-| `sample`           | 例子   |
+    ![Switch](photo/switch.svg)
+
+    | 端口名称          | 功用描述                                     |
+    | ----------------- | -------------------------------------------- |
+    | `switch_control`输入 | 开关的控制信号 |
+    | `switch_rdata`输入 | 当前开关中的值 |
+    | `Signed`输入 | 是否是有符号数 |
+    | `switch_wdata`输出 | 输出到其他模块的值 |
+
+- [Led ](cpu.srcs/sources_1/imports/led.sv)
+
+  Led: 负责写led的信号。
+
+  ![Led](photo/led.svg)
+
+    | 端口名称       | 功用描述             |
+    | -------------- | -------------------- |
+    | `clk`输入      | 时钟信号             |
+    | `rst`输入      | 复位信号             |
+    | `ledwdata`输入 | 其他模块想输出的值   |
+    | `ledout`输出   | 输出到led的值        |
+    | `ledtoseg`输出 | 输出到七段数码管的值 |
+
+- [Audio](cpu.srcs/sources_1/new/audio.v)
+
+    Audio: 负责控制蜂鸣器的信号。
+    
+    ![Audio](photo/audio.svg)
+    
+    | 端口名称       | 功用描述             |
+    | -------------- | -------------------- |
+    | `clk`输入      | 时钟信号             |
+    | `rst`输入      | 复位信号             |
+    | `stop`输入     | 是否已经执行完所有指令          |
+    | `buzzer`输出   | 输出到蜂鸣器的值        |
+    | `cur_note`输入 | 当前对应的音符        |
+
+- [Print](cpu.srcs/sources_1/new/print.v)
+
+    Print: 负责输出到七段数码管的信号。
+    
+    ![Print](photo/print.svg)
+
+    | 端口名称       | 功用描述             |
+    | -------------- | -------------------- |
+    | `clk`输入      | 时钟信号             |
+    | `Stop`输入     | 复位信号             |
+    | `in_init`输入  | 初始值               |
+    | `new`输入      | 新值                 |
+    | `out`输出      | 输出到七段数码管的值  |
+
+- [VGA](cpu.srcs/sources_1/new/vga.v)
+
+    VGA: 负责输出到VGA的信号。
+    
+    ![VGA](photo/vga.svg)
+
+    | 端口名称       | 功用描述             |
+    | -------------- | -------------------- |
+    | `clk`输入      | 时钟信号             |
+    | `rst`输入      | 复位信号             |
+    | `hs`输出       | 水平同步信号         |
+    | `vs`输出       | 垂直同步信号         |
+    | `r`输出        | VGA红色输出信号      |
+    | `g`输出        | VGA绿色输出信号      |
+    | `b`输出        | VGA蓝色输出信号      |
+    | `val`输入      | 输出到VGA的值        |
+
+- [VGA Char Set](cpu.srcs/sources_1/new/vga_char_set.v)
+
+    VGA Char Set: 负责输出到VGA的字体。
+    
+    ![VGA Char Set](photo/vga_char_set.svg)
+
+    | 端口名称       | 功用描述             |
+    | -------------- | -------------------- |
+    | `clk`输入      | 时钟信号             |
+    | `rst`输入      | 复位信号             |
+    | `data`输入     | 输出到VGA的值        |
+    | `col0`输出     | VGA输出信号 0          |
+    | `col1`输出     | VGA输出信号 1         |
+    | `col2`输出     | VGA输出信号 2         |
+    | `col3`输出     | VGA输出信号 3         |
+    | `col4`输出     | VGA输出信号 4         |
+    | `col5`输出     | VGA输出信号 5         |
+    | `col6`输出     | VGA输出信号 6         |
+
 
 ### 测试说明
 
@@ -495,6 +649,8 @@
     add t1, t1, t2
 ```
 
+该指令在测试场景2中得到测试。
+
 ##### auipc的实现
 将PC左移12位，然后存入rd寄存器，在我们的测试样例中，我们将Switch以及LED的地址，通过auipc命令+addi命令导入寄存器，然后通过lw命令读取内存，最后通过sw命令将输出存入内存中。
 
@@ -510,6 +666,9 @@
 	auipc x6, 0x0000fc10
 	addi x6, x6, 0xfffffffc 
 ```
+
+该指令在测试场景1中得到测试。
+
 ##### ecall的实现
 
 ecall指令是一个系统调用指令，用于在用户态和内核态之间进行切换。在我们的测试样例中， 当`a7 = 0`的时候，调用用ecall指令便会从Switch中读取数据并且储存到a0寄存器当中，当`a7 = 1`的时候，调用ecall指令便会从a0寄存器中读取值并且通过LED的方式输出出来。
@@ -522,6 +681,8 @@ ecall指令是一个系统调用指令，用于在用户态和内核态之间进
     li a7, 1
     ecall
 ```
+
+该指令在测试场景1-1中得到测试。
 
 #### 2. 实现对复杂外设接口的支持
 
@@ -738,7 +899,7 @@ exit_loop:
 
 对应的曲谱为：![二零三](./photo/203.png)
 
-在这个音乐播放器中，我们通过读取内存中的音符（`stage_mem`中），将其转化为对应的频率，然后通过蜂鸣器输出。
+在这个音乐播放器中，我们通过读取内存中的音符（`stage_mem`中），将其转化为对应的频率，然后通过蜂鸣器输出。以《二零三》为例，我们可以在蜂鸣器中听到对应的音乐。
 
 音乐输出的相关代码为：
 

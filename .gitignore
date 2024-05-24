@@ -69,7 +69,7 @@ Temporary Items
 !*.gif
 !*.tiff
 !*.pdf
-
+!*.svg
 !*.py
 !*.h
 !*.cpp
