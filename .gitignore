@@ -62,6 +62,12 @@ Temporary Items
 *
 !scenario/
 !tools/
+!photo/
+!*.jpg
+!*.png
+!*.bmp
+!*.gif
+!*.tiff
 !*.py
 !*.h
 !*.cpp
